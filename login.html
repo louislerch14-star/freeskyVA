@@ -103,7 +103,7 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjV3EWfw1A_akdeF51J";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -112,7 +112,6 @@
 
         // Hilfsfunktion zur Ermittlung der korrekten Redirect-URL
         function getRedirectUrl() {
-            // Schneidet den aktuellen Dateinamen ab und händigt den Pfad zur index.html aus
             const currentPath = window.location.pathname;
             const directoryPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
             return window.location.origin + directoryPath + '/index.html';
@@ -247,7 +246,6 @@
                 }
             };
 
-            // Falls sich jemand neu über Google registriert, hängen wir die Metadaten an!
             if (modalMode === 'register') {
                 const airlineName = document.getElementById('airlineInput').value;
                 oauthOptions.options.data = {
