@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FreeSky VA</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#000000',
+                        zincBase: '#09090b',
+                        vercelBlue: '#0070f3',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-white font-sans min-h-screen antialiased flex flex-col justify-between">
+
+    <header class="border-b border-zinc-800/80 bg-zincBase/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="logo.png" alt="FreeSky Logo" class="w-7 h-7 object-contain">
+                <span class="text-base font-bold tracking-wider">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <span id="userEmail" class="text-xs text-zinc-400">Lade Profil...</span>
+                <button onclick="handleLogout()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
+                    Abmelden
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
+        
+        <div class="mb-10 border-b border-zinc-900 pb-6">
+            <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Willkommen im Cockpit</h1>
+            <p id="roleBadge" class="text-zinc-500 text-xs mt-1 uppercase tracking-wider font-medium">Rolle: <span class="text-vercelBlue">—</span></p>
+        </div>
+
+        <div id="loadingState" class="text-center py-20">
+            <div class="inline-block w-6 h-6 border-2 border-vercelBlue border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-zinc-500 text-xs mt-2">Daten werden synchronisiert...</p>
+        </div>
+
+        <div id="pilotDashboard" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Gesamte Flugzeit</span>
+                    <h3 class="text-2xl font-semibold mt-1">0.0 Std</h3>
+                </div>
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Absolvierte Flüge</span>
+                    <h3 class="text-2xl font-semibold mt-1">0</h3>
+                </div>
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Durchschnittliche Landung</span>
+                    <h3 class="text-2xl font-semibold mt-1">— fpm</h3>
+                </div>
+            </div>
+
+            <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Deine letzten Flüge</h2>
+                <div class="text-center py-8 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
+                    Noch keine aufgezeichneten Flüge vorhanden. Starte den ACARS-Tracker, um abzuheben!
+                </div>
+            </div>
+        </div>
+
+        <div id="ceoDashboard" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Airline-Finanzen</span>
+                    <h3 class="text-2xl font-semibold mt-1 text-emerald-400">v$ 500.000</h3>
+                </div>
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Angestellte Piloten</span>
+                    <h3 class="text-2xl font-semibold mt-1">1 (Du)</h3>
+                </div>
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Flotten-Status</span>
+                    <h3 class="text-2xl font-semibold mt-1">0 Flugzeuge</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Bewerbungen (Piloten-Anträge)</h2>
+                    <div class="text-center py-6 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
+                        Keine offenen Bewerbungen vorhanden.
+                    </div>
+                </div>
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Airline-Einstellungen</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Name der Fluggesellschaft</label>
+                            <input type="text" id="airlineNameDisplay" readonly class="w-full bg-black border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-400 outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
+        <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
+    </footer>
+
+    <script>
+        // --- 1. SUPABASE INITIALISIERUNG ---
+        const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- 2. SECURITY CHECK: EINGELOGGT ODER NICHT? ---
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session }, error } = await _supabase.auth.getSession();
+            
+            if (error || !session) {
+                // Nicht eingeloggt? Sofort zurück zur Login-Seite kicken!
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // User-E-Mail in der Navigation anzeigen
+            document.getElementById('userEmail').textContent = session.user.email;
+
+            // Metadaten auslesen (Rolle und Airline-Name)
+            const userMetadata = session.user.user_metadata;
+            const role = userMetadata?.role || 'pilot'; // Fallback auf Pilot, falls nichts gesetzt
+            const airlineName = userMetadata?.airline_name || 'Keine Airline';
+
+            // UI-Weiche umschalten
+            document.getElementById('loadingState').classList.add('hidden');
+            
+            if (role === 'ceo') {
+                document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">CEO</span> | Airline: <span class="text-zinc-300">${airlineName}</span>`;
+                document.getElementById('ceoDashboard').classList.remove('hidden');
+                document.getElementById('airlineNameDisplay').value = airlineName;
+            } else {
+                document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">Pilot</span>`;
+                document.getElementById('pilotDashboard').classList.remove('hidden');
+            }
+        });
+
+        // --- 3. LOGOUT ABSCHLIESSEN ---
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
