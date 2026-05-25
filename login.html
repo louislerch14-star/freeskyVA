@@ -79,7 +79,7 @@
                 <div class="flex-grow border-t border-zinc-800"></div>
             </div>
 
-            <button onclick="loginWithGoogle()" class="w-full bg-black border border-zinc-800 text-zinc-200 font-medium text-sm py-2.5 rounded-md hover:bg-zinc-900 hover:text-white transition flex items-center justify-center space-x-2">
+            <button onclick="loginWithGoogle()" type="button" class="w-full bg-black border border-zinc-800 text-zinc-200 font-medium text-sm py-2.5 rounded-md hover:bg-zinc-900 hover:text-white transition flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -91,7 +91,7 @@
 
             <div class="text-center mt-6 pt-4 border-t border-zinc-900 text-xs text-zinc-500">
                 <span id="modalFooterText">Noch kein Konto?</span> 
-                <button id="modalFooterLink" onclick="toggleModalMode()" class="text-vercelBlue hover:underline ml-1">Jetzt registrieren</button>
+                <button type="button" id="modalFooterLink" onclick="toggleModalMode()" class="text-vercelBlue hover:underline ml-1">Jetzt registrieren</button>
             </div>
         </div>
     </main>
@@ -103,9 +103,11 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
+        // HINWEIS: Ersetze diesen Key durch deinen echten "anon / public" Key (beginnt meistens mit eyJhbGci...)
         const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Fix: Variable umbenannt, um Namenskonflikt mit der Library zu vermeiden
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let modalMode = 'login'; 
         let selectedRole = 'pilot';
@@ -190,7 +192,7 @@
             submitBtn.textContent = 'Bitte warten...';
 
             if (modalMode === 'login') {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await _supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
@@ -199,10 +201,10 @@
                     alert("Fehler: " + error.message);
                 } else {
                     alert('Login erfolgreich!');
-                    window.location.href = 'index.html'; // Nach Login zurück zur Hauptseite
+                    window.location.href = 'index.html';
                 }
             } else {
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await _supabase.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -227,7 +229,7 @@
 
         // --- 4. GOOGLE OAUTH FLOW ---
         async function loginWithGoogle() {
-            const { data, error } = await supabase.auth.signInWithOAuth({
+            const { data, error } = await _supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                     redirectTo: window.location.origin + '/index.html'
