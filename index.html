@@ -7,6 +7,7 @@
     
     <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
         tailwind.config = {
@@ -70,9 +71,11 @@
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 text-[10px]">▼</div>
                 </div>
 
-                <button onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
-                    Login
-                </button>
+                <div id="authArea">
+                    <button id="loginBtn" onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
+                        Login
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -183,7 +186,46 @@
     </footer>
 
     <script>
-        // --- 1. SPRACH-LOGIK ---
+        // --- 1. SUPABASE PROJEKT HOOLEN ---
+        const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J"; // Achte darauf, dass hier dein echter Key drinsteht
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- 2. LOGGED IN STATUS ÜBERPRÜFEN ---
+        async function checkUserSession() {
+            const { data: { session }, error } = await _supabase.auth.getSession();
+            const authArea = document.getElementById('authArea');
+
+            if (session && session.user) {
+                // User-Objekt holen. Entweder voller Name aus Google OAuth oder die E-Mail Adresse bei Mail-Login
+                const displayName = session.user.user_metadata.full_name || session.user.email;
+
+                // Ersetzt den Login Button durch den Usernamen + Logout Button
+                authArea.innerHTML = `
+                    <div class="flex items-center space-x-3 bg-zinc-900/80 border border-zinc-800 px-3 py-1 rounded-lg">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-xs font-medium text-zinc-200">${displayName}</span>
+                        <button onclick="handleLogout()" class="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-white transition pl-2 border-l border-zinc-800">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // --- 3. LOGOUT ABSCHICKEN ---
+        async function handleLogout() {
+            const { error } = await _supabase.auth.signOut();
+            if (error) {
+                alert("Fehler beim Abmelden: " + error.message);
+            } else {
+                // Lädt die Seite neu, damit der Header wieder zurückgesetzt wird
+                window.location.reload();
+            }
+        }
+
+        // --- 4. SPRACH-LOGIK ---
         const translations = document.querySelectorAll('[data-lang-de]');
         let currentLang = 'de';
         
@@ -199,16 +241,21 @@
             document.getElementById('langSwitcher').value = lang;
         }
 
+        // Initialisierung beim Seitenstart
         window.addEventListener('DOMContentLoaded', () => {
+            // Check Sprache
             const browserLang = navigator.language || navigator.userLanguage;
             if (!browserLang.startsWith('de')) {
                 changeLanguage('en');
             } else {
                 changeLanguage('de');
             }
+
+            // Check Login Status
+            checkUserSession();
         });
 
-        // --- 2. SCROLL-ANIMATION ---
+        // --- 5. SCROLL-ANIMATION ---
         const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
         const checkScroll = () => {
             const triggerBottom = window.innerHeight / 5 * 4.5;
@@ -224,7 +271,7 @@
         window.addEventListener('scroll', checkScroll);
         checkScroll();
 
-        // --- 3. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
+        // --- 6. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
         function redirectToAuth(mode, role = 'pilot') {
             window.location.href = `login.html?mode=${mode}&role=${role}`;
         }
