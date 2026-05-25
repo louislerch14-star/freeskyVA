@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeSky VA - Professional Virtual Airline Platform</title>
+    <title>FreeSky VA - Professional Flight Simulation</title>
     
-    <link class="rounded" rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -23,338 +23,145 @@
         }
     </script>
     <style>
-        * {
-            hyphens: none !important;
-            -webkit-hyphens: none !important;
-            -ms-hyphens: none !important;
+        /* Der dicke, fette Puls-Effekt für maximales Auffallen */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 25px -3px rgba(0, 112, 243, 0.6); }
+            50% { transform: scale(1.03); box-shadow: 0 0 40px 4px rgba(0, 112, 243, 0.9); }
         }
-
-        .bg-airplane {
-            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('airplane01.webp');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .scroll-zoom-reveal {
-            opacity: 0;
-            transform: scale(0.85) translateY(40px);
-            filter: blur(4px);
-            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 1s cubic-bezier(0.16, 1, 0.3, 1), 
-                        filter 1s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform, opacity, filter;
-        }
-
-        .scroll-zoom-reveal.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            filter: blur(0);
+        .leucht-button {
+            animation: pulseGlow 2s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="bg-darkBg text-white font-sans min-h-screen antialiased overflow-x-hidden">
+<body class="bg-darkBg text-white font-sans min-h-screen antialiased flex flex-col justify-between">
 
-    <section class="bg-airplane min-h-screen flex flex-col justify-between">
-        <header class="border-b border-zinc-800/50 px-6 py-4 flex justify-between items-center max-w-7xl mx-auto w-full backdrop-blur-md bg-black/40 sticky top-0 z-50">
+    <header class="border-b border-zinc-800/80 bg-zincBase/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <img src="logo.png" alt="FreeSky Logo" class="w-8 h-8 object-contain">
-                <span class="text-lg font-bold tracking-wider text-white">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
+                <img src="logo.png" alt="FreeSky Logo" class="w-7 h-7 object-contain">
+                <span class="text-base font-bold tracking-wider">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
             </div>
             
-            <div class="flex items-center space-x-4">
-                <div class="relative inline-block text-left">
-                    <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-zinc-900 border border-zinc-800 text-gray-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-700 cursor-pointer appearance-none pr-6 relative">
-                        <option value="de">🇩🇪 DE</option>
-                        <option value="en">🇺🇸 EN</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 text-[10px]">▼</div>
+            <nav class="flex items-center space-x-4">
+                <div id="navAuthenticated" class="hidden flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-xs bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-medium transition">
+                        Zum Dashboard →
+                    </a>
                 </div>
-
-                <div id="authArea">
-                    <button id="loginBtn" onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
+                
+                <div id="navGuest" class="hidden flex items-center space-x-2">
+                    <a href="login.html" class="text-xs text-zinc-400 hover:text-white px-3 py-1.5 transition">
                         Login
-                    </button>
+                    </a>
+                    <a href="register.html" class="bg-zinc-900 border border-zinc-800 text-white text-xs px-3 py-1.5 rounded-md font-medium hover:bg-zinc-800 transition">
+                        Registrieren
+                    </a>
                 </div>
-            </div>
-        </header>
-
-        <main class="flex-grow flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto py-12">
-            <h1 class="text-4xl md:text-6xl font-medium tracking-tight mb-6">
-                <span data-lang-de="Deine eigene Virtual Airline." data-lang-en="Your own Virtual Airline.">Deine eigene Virtual Airline.</span><br>
-                <span class="text-vercelBlue" data-lang-de="100% kostenlos." data-lang-en="100% free.">100% kostenlos.</span>
-            </h1>
-            
-            <p class="text-zinc-400 text-base md:text-lg max-w-2xl mb-10 leading-relaxed font-light" data-lang-de="Gründe deine eigene Fluggesellschaft für den Microsoft Flight Simulator. Verwalte deine Mitglieder und fliege gemeinsam mit einer professionellen Community komplett ohne Kosten." data-lang-en="Create your own airline for Microsoft Flight Simulator. Manage your members and fly together with a professional community – completely free of charge.">
-                Gründe deine eigene Fluggesellschaft für den Microsoft Flight Simulator. Verwalte deine Mitglieder und fliege gemeinsam mit einer professionellen Community komplett ohne Kosten.
-            </p>
-
-            <div id="heroActionArea" class="flex flex-col items-center justify-center w-full px-6">
-                <div id="guestButtons" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full justify-center">
-                    <button onclick="redirectToAuth('register', 'ceo')" class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
-                        Airline gründen
-                    </button>
-                    <button onclick="redirectToAuth('register', 'pilot')" class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
-                        Als Pilot beitreten
-                    </button>
-                </div>
-
-                <div id="authenticatedView" class="hidden flex flex-col items-center space-y-4">
-                    <button onclick="window.location.href='dashboard.html'" class="bg-vercelBlue text-white px-10 py-3.5 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200 shadow-lg shadow-blue-500/20" data-lang-de="Zum Dashboard wechseln" data-lang-en="Go to Dashboard">
-                        Zum Dashboard wechseln
-                    </button>
-                    <p id="countdownText" class="text-zinc-500 text-xs font-light tracking-wide">
-                        <span data-lang-de="Automatische Weiterleitung in" data-lang-en="Automatic redirect in">Automatische Weiterleitung in</span> 
-                        <span id="countdownTimer" class="font-bold text-vercelBlue">5</span>s...
-                    </p>
-                </div>
-            </div>
-        </main>
-        
-        <div class="pb-8 text-center animate-bounce text-zinc-500 text-xs tracking-widest hidden md:block uppercase font-medium">
-            Scroll ↓
+            </nav>
         </div>
-    </section>
+    </header>
 
-    <section class="bg-white text-black py-32 px-6 scroll-zoom-reveal">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-20">
-                <span class="text-vercelBlue font-semibold text-xs tracking-widest uppercase">Management Hub</span>
-                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mt-2" data-lang-de="Alles im Griff. Bis zu 100 Mitglieder." data-lang-en="Full Control. Up to 100 Members.">Alles im Griff. Bis zu 100 Mitglieder.</h2>
-                <p class="text-zinc-500 mt-4 max-w-xl mx-auto text-base font-light" data-lang-de="Egal ob du eine kleine Chartergesellschaft oder eine internationale Allianz aufbauen willst unsere Verwaltungs-Tools geben dir die volle Kontrolle." data-lang-en="Whether you want to build a small charter company or an international alliance our management tools give you full control.">
-                    Egal ob du eine kleine Chartergesellschaft oder eine internationale Allianz aufbauen willst unsere Verwaltungs-Tools geben dir die volle Kontrolle.
+    <main class="max-w-7xl mx-auto w-full px-6 py-16 space-y-20 flex-grow">
+        
+        <div class="text-center space-y-8 py-12 relative overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-vercelBlue/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div class="space-y-4 relative z-10">
+                <div class="inline-flex items-center space-x-2 bg-zinc-900/80 border border-zinc-800/60 px-3 py-1 rounded-full text-[11px] font-medium tracking-wide text-zinc-400">
+                    <span class="w-2 h-2 bg-vercelBlue rounded-full animate-ping"></span>
+                    <span>Next-Gen Flight Simulation Network</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-400">
+                    Deine Airline. Deine Crew.<br>Dein Cockpit.
+                </h1>
+                <p class="text-zinc-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-light">
+                    Gründe eine virtuelle Airline, verwalte deine Flotte und zeichne deine Flüge im MSFS mit maximalem Realismus auf. Professionell, präzise, fälschungssicher.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div class="space-y-10">
-                    <div class="flex items-start space-x-4">
-                        <div class="text-vercelBlue text-xl mt-1">✓</div>
-                        <div>
-                            <h3 class="font-semibold text-lg mb-1" data-lang-de="CEO Dashboard" data-lang-en="CEO Dashboard">CEO Dashboard</h3>
-                            <p class="text-zinc-600 text-sm leading-relaxed font-light" data-lang-de="Akzeptiere neue Piloten mit einem Klick, lade eigene Airline-Logos hoch und bestimme die Regeln deiner Fluggesellschaft." data-lang-en="Accept new pilots with one click, upload custom airline logos, and define the rules of your fleet.">Akzeptiere neue Piloten mit einem Klick, lade eigene Airline-Logos hoch und bestimme die Regeln deiner Fluggesellschaft.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start space-x-4">
-                        <div class="text-vercelBlue text-xl mt-1">✓</div>
-                        <div>
-                            <h3 class="font-semibold text-lg mb-1" data-lang-de="Echte Finanzen & Statistiken" data-lang-en="Real Finances & Statistics">Echte Finanzen & Statistiken</h3>
-                            <p class="text-zinc-600 text-sm leading-relaxed font-light" data-lang-de="Verdiene virtuelles Geld durch erfolgreiche Flüge deiner Piloten. Bezahle Treibstoff und behalte die Ausgaben im Auge." data-lang-en="Earn virtual money through successful flights by your pilots. Pay for fuel and keep track of expenses.">Verdiene virtuelles Geld durch erfolgreiche Flüge deiner Piloten. Bezahle Treibstoff und behalte die Ausgaben im Auge.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-zinc-50 border border-zinc-200/80 p-8 rounded-lg shadow-sm font-sans">
-                    <div class="flex items-center justify-between border-b border-zinc-200 pb-4 mb-4">
-                        <span class="font-medium text-xs text-zinc-400 uppercase tracking-wider" data-lang-de="Live Status" data-lang-en="Live Status">Live Status</span>
-                        <span class="w-2 h-2 bg-zinc-400 rounded-full"></span>
-                    </div>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between py-2 border-b border-zinc-100"><span class="text-zinc-500" data-lang-de="Aktive Piloten" data-lang-en="Active Pilots">Aktive Piloten</span><span class="font-medium text-zinc-900">42 / 100</span></div>
-                        <div class="flex justify-between py-2 border-b border-zinc-100"><span class="text-zinc-500" data-lang-de="Absolvierte Flüge" data-lang-en="Completed Flights">Absolvierte Flüge</span><span class="font-medium text-zinc-900">1,248</span></div>
-                        <div class="flex justify-between py-2"><span class="text-zinc-500" data-lang-de="Plattform Kosten" data-lang-en="Platform Costs">Plattform Kosten</span><span class="font-medium text-vercelBlue">0.00 EUR</span></div>
-                    </div>
-                </div>
+            <div class="flex justify-center pt-4 relative z-10">
+                <a id="heroActionBtn" href="register.html" class="leucht-button bg-vercelBlue hover:bg-blue-600 text-white text-sm font-bold tracking-wider px-10 py-5 rounded-xl transition duration-300 transform flex items-center space-x-3 shadow-lg">
+                    <span>JETZT ALS PILOT STARTEN</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
             </div>
         </div>
-    </section>
 
-    <section class="bg-zincBase text-white py-32 px-6 border-t border-zinc-900 scroll-zoom-reveal">
-        <div class="max-w-5xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div class="bg-black border border-zinc-800/80 p-8 rounded-lg font-mono text-xs text-zinc-400">
-                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
-                        <span class="text-vercelBlue">SYSTEM_READY</span>
-                        <span>v1.0.0</span>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="flex justify-between"><span>ALTITUDE:</span> <span class="text-white">34,000 FT</span></p>
-                        <p class="flex justify-between"><span>AIRSPEED:</span> <span class="text-white">420 KT</span></p>
-                        <p class="flex justify-between"><span>FUEL FLOW:</span> <span class="text-white">2,400 LBS/HR</span></p>
-                        <p class="flex justify-between text-white border-t border-zinc-900 pt-2 font-bold"><span>LANDING RATE:</span> <span>-120 FT/MIN</span></p>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl space-y-3">
+                <div class="w-8 h-8 rounded-lg bg-vercelBlue/10 border border-vercelBlue/20 flex items-center justify-center text-vercelBlue">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 </div>
+                <h3 class="text-sm font-semibold text-zinc-200">Airline gründen</h3>
+                <p class="text-zinc-500 text-xs leading-relaxed">
+                    Werde CEO deiner eigenen virtuellen Fluggesellschaft. Bestimme das Branding, wähle deinen Hauptsitz aus und baue ein globales Streckennetz auf.
+                </p>
+            </div>
 
-                <div class="space-y-6">
-                    <span class="text-vercelBlue font-semibold text-xs tracking-widest uppercase" data-lang-de="Automatisches Tracking" data-lang-en="Automated Tracking">Automatisches Tracking</span>
-                    <h2 class="text-3xl font-semibold tracking-tight" data-lang-de="Unser kostenloser ACARS-Tracker" data-lang-en="Our Free ACARS Tracker">Unser kostenloser ACARS-Tracker</h2>
-                    <p class="text-zinc-400 text-sm leading-relaxed font-light" data-lang-de="Keine manuelle Flugbucheintragung mehr nötig. Unser leichtes Desktop-Tool verbindet sich direkt mit deinem Simulator, zeichnet alle Flugdaten vollautomatisch auf und übermittelt sie fehlerfrei an dein Dashboard." data-lang-en="No manual logbook entries required. Our lightweight desktop tool connects directly to your simulator, records all flight data automatically, and transfers it flawlessly to your dashboard.">
-                        Keine manuelle Flugbucheintragung mehr nötig. Unser leichtes Desktop-Tool verbindet sich direkt mit deinem Simulator, zeichnet alle Flugdaten vollautomatisch auf und übermittelt sie fehlerfrei an dein Dashboard.
-                    </p>
-                    <div class="pt-2">
-                        <span class="text-xs text-zinc-500 border border-zinc-800 px-3 py-1.5 rounded" data-lang-de="Unterstützt MSFS 2020 & MSFS 2024" data-lang-en="Supports MSFS 2020 & MSFS 2024">
-                            Unterstützt MSFS 2020 & MSFS 2024
-                        </span>
-                    </div>
+            <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl space-y-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </div>
+                <h3 class="text-sm font-semibold text-zinc-200">Piloten anheuern</h3>
+                <p class="text-zinc-500 text-xs leading-relaxed">
+                    Rekrutiere echte Simulator-Piloten für deine Airline. Teile ihnen Ränge zu, verwalte Verträge und verfolge ihre individuelle Flugleistung im Cockpit.
+                </p>
+            </div>
+
+            <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl space-y-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <h3 class="text-sm font-semibold text-zinc-200">Live Flugtracker & Logs</h3>
+                <p class="text-zinc-500 text-xs leading-relaxed">
+                    Zeichne Flugstunden, Routen, Treibstoffverbrauch und Landeraten fälschungssicher auf. Alle Daten werden direkt mit deinem Pilotenprofil synchronisiert.
+                </p>
             </div>
         </div>
-    </section>
 
-    <footer class="bg-black border-t border-zinc-900 py-12 text-zinc-600 text-xs">
-        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <span class="font-medium tracking-wider text-zinc-400">FREESKY VA</span>
-            <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
-        </div>
+    </main>
+
+    <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
+        <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
     </footer>
 
     <script>
-        // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- 2. HEADER INTERFACE UPDATEN & COUNTDOWN MANAGEMENT ---
-        let redirectTimeout;
-        let redirectInterval;
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            const navAuth = document.getElementById('navAuthenticated');
+            const navGuest = document.getElementById('navGuest');
+            const heroBtn = document.getElementById('heroActionBtn');
 
-        function updateUserHeader(user) {
-            const authArea = document.getElementById('authArea');
-            const guestButtons = document.getElementById('guestButtons');
-            const authenticatedView = document.getElementById('authenticatedView');
+            if (session) {
+                // User ist eingeloggt: Zeige Dashboard-Link in der Navbar
+                navAuth.classList.remove('hidden');
+                navGuest.classList.add('hidden');
 
-            if (user) {
-                const displayName = user.user_metadata?.full_name || user.email;
-
-                // Header auf "Eingeloggt" setzen
-                authArea.innerHTML = `
-                    <div class="flex items-center space-x-3 bg-zinc-900/80 border border-zinc-800 px-3 py-1 rounded-lg">
-                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span class="text-xs font-medium text-zinc-200">${displayName}</span>
-                        <button onclick="handleLogout()" class="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-white transition pl-2 border-l border-zinc-800">
-                            Logout
-                        </button>
-                    </div>
+                // Verwandle den Hero-Button in eine unaufälligere Dashboard-Abkürzung
+                heroBtn.href = "dashboard.html";
+                heroBtn.innerHTML = `
+                    <span>Flugbetrieb aufnehmen</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
                 `;
-
-                // Buttons in der Hero-Section tauschen
-                if (guestButtons && authenticatedView && authenticatedView.classList.contains('hidden')) {
-                    guestButtons.classList.add('hidden');
-                    authenticatedView.classList.remove('hidden');
-                    startDashboardCountdown();
-                }
+                // Leuchten ausmachen, da der Pilot bereits an Bord ist
+                heroBtn.classList.remove('leucht-button');
+                heroBtn.className = "bg-zinc-900 border border-zinc-800 text-white text-sm font-medium px-8 py-4 rounded-xl hover:bg-zinc-800 transition flex items-center space-x-3 shadow-md";
             } else {
-                // Header zurücksetzen
-                authArea.innerHTML = `
-                    <button id="loginBtn" onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
-                        Login
-                    </button>
-                `;
-
-                // Buttons zurücksetzen, falls ausgeloggt wird
-                if (guestButtons && authenticatedView) {
-                    guestButtons.classList.remove('hidden');
-                    authenticatedView.classList.add('hidden');
-                    clearInterval(redirectInterval);
-                    clearTimeout(redirectTimeout);
-                }
+                // User ist Gast: Zeige Login/Register und dicken Leucht-Button
+                navGuest.classList.remove('hidden');
+                navAuth.classList.add('hidden');
             }
-        }
-
-        // --- 3. COUNTDOWN TIMER LOGIK ---
-        function startDashboardCountdown() {
-            let secondsLeft = 5;
-            const timerDisplay = document.getElementById('countdownTimer');
-
-            redirectInterval = setInterval(() => {
-                secondsLeft--;
-                if (timerDisplay) {
-                    timerDisplay.textContent = secondsLeft;
-                }
-                if (secondsLeft <= 0) {
-                    clearInterval(redirectInterval);
-                }
-            }, 1000);
-
-            redirectTimeout = setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 5000);
-        }
-
-        // --- 4. DYNAMISCHER AUTH CHECKER ---
-        function initAuthCheck() {
-            _supabase.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
-                    updateUserHeader(session.user);
-                    cleanUrlHash();
-                }
-            });
-
-            _supabase.auth.onAuthStateChange((event, session) => {
-                if (session) {
-                    updateUserHeader(session.user);
-                    cleanUrlHash();
-                } else {
-                    updateUserHeader(null);
-                }
-            });
-        }
-
-        function cleanUrlHash() {
-            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token') || window.location.hash.includes('error'))) {
-                window.history.replaceState(null, null, window.location.pathname);
-            }
-        }
-
-        // --- 5. LOGOUT EXECUTION ---
-        async function handleLogout() {
-            clearInterval(redirectInterval);
-            clearTimeout(redirectTimeout);
-            const { error } = await _supabase.auth.signOut();
-            if (error) {
-                alert("Fehler beim Abmelden: " + error.message);
-            } else {
-                window.location.reload();
-            }
-        }
-
-        // --- 6. SPRACH-LOGIK ---
-        const translations = document.querySelectorAll('[data-lang-de]');
-        let currentLang = 'de';
-        
-        function changeLanguage(lang) {
-            currentLang = lang;
-            translations.forEach(el => {
-                if (lang === 'en') {
-                    el.textContent = el.getAttribute('data-lang-en');
-                } else {
-                    el.textContent = el.getAttribute('data-lang-de');
-                }
-            });
-            document.getElementById('langSwitcher').value = lang;
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const browserLang = navigator.language || navigator.userLanguage;
-            if (!browserLang.startsWith('de')) {
-                changeLanguage('en');
-            } else {
-                changeLanguage('de');
-            }
-
-            initAuthCheck();
         });
-
-        // --- 7. SCROLL-ANIMATION ---
-        const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
-        const checkScroll = () => {
-            const triggerBottom = window.innerHeight / 5 * 4.5;
-            zoomSections.forEach(section => {
-                const sectionTop = section.getBoundingClientRect().top;
-                if (sectionTop < triggerBottom) {
-                    section.classList.add('active');
-                } else {
-                    section.classList.remove('active');
-                }
-            });
-        };
-        window.addEventListener('scroll', checkScroll);
-        checkScroll();
-
-        function redirectToAuth(mode, role = 'pilot') {
-            window.location.href = `login.html?mode=${mode}&role=${role}`;
-        }
     </script>
 </body>
 </html>
