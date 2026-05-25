@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline gründen - FreeSky VA</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#000000',
+                        zincBase: '#09090b',
+                        vercelBlue: '#0070f3',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-white font-sans min-h-screen antialiased flex flex-col justify-between">
+
+    <header class="border-b border-zinc-800/80 bg-zincBase/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="logo.png" alt="FreeSky Logo" class="w-7 h-7 object-contain">
+                <span class="text-base font-bold tracking-wider">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="dashboard.html" class="text-xs text-zinc-400 hover:text-white transition">Zurück zum Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-6 py-12 relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-vercelBlue/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="bg-zincBase border border-zinc-800/80 w-full max-w-md rounded-xl shadow-2xl p-8 relative z-10 space-y-6">
+            <div class="space-y-2">
+                <h2 class="text-xl font-bold tracking-tight">Virtuelle Airline gründen</h2>
+                <p class="text-zinc-500 text-xs leading-relaxed">
+                    Tritt vor als CEO. Bestimme den Namen, das Kürzel und den Hauptsitz deiner neuen Fluggesellschaft.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-zinc-400 text-[10px] uppercase font-bold block mb-1">Name der Airline</label>
+                    <input type="text" id="airlineName" placeholder="e.g. Hansea Virtual" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-zinc-400 text-[10px] uppercase font-bold block mb-1">Airline-Code (3-stellig)</label>
+                        <input type="text" id="airlineIcao" placeholder="e.g. HNA" maxlength="3" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                    </div>
+                    <div>
+                        <label class="text-zinc-400 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
+                        <input type="text" id="airlineHub" placeholder="e.g. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="hidden text-red-500 text-xs bg-red-500/10 border border-red-500/20 p-3 rounded-lg"></div>
+
+            <button id="createBtn" onclick="processAirlineCreation()" class="w-full bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs py-3 rounded-md transition flex items-center justify-center space-x-2 shadow-lg">
+                <span>Airline offiziell registrieren</span>
+            </button>
+        </div>
+    </main>
+
+    <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
+        <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            if (!session) {
+                // Nicht eingeloggt? Ab zum Login.
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+        });
+
+        async function processAirlineCreation() {
+            if (!currentUser) return;
+
+            const nameInput = document.getElementById('airlineName').value.trim();
+            const icaoInput = document.getElementById('airlineIcao').value.trim().toUpperCase();
+            const hubInput = document.getElementById('airlineHub').value.trim().toUpperCase();
+            const errorDiv = document.getElementById('errorMessage');
+            const createBtn = document.getElementById('createBtn');
+
+            errorDiv.classList.add('hidden');
+
+            // Validierung
+            if (!nameInput || !icaoInput || !hubInput) {
+                showError("Bitte fülle alle Felder komplett aus.");
+                return;
+            }
+            if (icaoInput.length !== 3) {
+                showError("Der Airline-Code muss genau 3 Zeichen lang sein (z.B. DLH).");
+                return;
+            }
+            if (hubInput.length !== 4) {
+                showError("Die Heimatbasis muss ein gültiger 4-stelliger ICAO-Code sein (z.B. EDDF).");
+                return;
+            }
+
+            createBtn.disabled = true;
+            createBtn.textContent = "Registriere Fluggesellschaft...";
+
+            // 1. Airline in der Datenbank anlegen
+            const { data: newAirline, error: airlineError } = await _supabase
+                .from('airlines')
+                .insert([{ 
+                    name: nameInput, 
+                    icao_code: icaoInput, 
+                    home_hub: hubInput, 
+                    owner_id: currentUser.id 
+                }])
+                .select()
+                .single();
+
+            if (airlineError) {
+                showError("Fehler beim Erstellen: " + airlineError.message);
+                resetButton();
+                return;
+            }
+
+            // 2. Das Profil des Users mit der neuen Airline verknüpfen
+            const { error: profileError } = await _supabase
+                .from('profiles')
+                .update({ airline_id: newAirline.id, rank: 'CEO' })
+                .eq('id', currentUser.id);
+
+            // 3. User-Rolle in den Metadaten auf CEO setzen
+            await _supabase.auth.updateUser({
+                data: { role: 'ceo', airline_name: nameInput }
+            });
+
+            if (profileError) {
+                showError("Airline erstellt, aber Profilverknüpfung schlug fehl: " + profileError.message);
+                resetButton();
+            } else {
+                // Erfolgreich! Zurück zum Dashboard
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function resetButton() {
+            const createBtn = document.getElementById('createBtn');
+            createBtn.disabled = false;
+            createBtn.textContent = "Airline offiziell registrieren";
+        }
+    </script>
+</body>
+</html>
