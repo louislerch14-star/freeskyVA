@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreeSky VA - Professional Virtual Airline Platform</title>
     
-    <link rel="icon" type="image/png" href="logo.png">
+    <link class="rounded" rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -89,15 +89,28 @@
                 Gründe deine eigene Fluggesellschaft für den Microsoft Flight Simulator. Verwalte deine Mitglieder und fliege gemeinsam mit einer professionellen Community komplett ohne Kosten.
             </p>
 
-            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full justify-center px-6">
-                <button onclick="redirectToAuth('register', 'ceo')" class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
-                    Airline gründen
-                </button>
-                <button onclick="redirectToAuth('register', 'pilot')" class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
-                    Als Pilot beitreten
-                </button>
+            <div id="heroActionArea" class="flex flex-col items-center justify-center w-full px-6">
+                <div id="guestButtons" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full justify-center">
+                    <button onclick="redirectToAuth('register', 'ceo')" class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
+                        Airline gründen
+                    </button>
+                    <button onclick="redirectToAuth('register', 'pilot')" class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
+                        Als Pilot beitreten
+                    </button>
+                </div>
+
+                <div id="authenticatedView" class="hidden flex flex-col items-center space-y-4">
+                    <button onclick="window.location.href='dashboard.html'" class="bg-vercelBlue text-white px-10 py-3.5 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200 shadow-lg shadow-blue-500/20" data-lang-de="Zum Dashboard wechseln" data-lang-en="Go to Dashboard">
+                        Zum Dashboard wechseln
+                    </button>
+                    <p id="countdownText" class="text-zinc-500 text-xs font-light tracking-wide">
+                        <span data-lang-de="Automatische Weiterleitung in" data-lang-en="Automatic redirect in">Automatische Weiterleitung in</span> 
+                        <span id="countdownTimer" class="font-bold text-vercelBlue">5</span>s...
+                    </p>
+                </div>
             </div>
         </main>
+        
         <div class="pb-8 text-center animate-bounce text-zinc-500 text-xs tracking-widest hidden md:block uppercase font-medium">
             Scroll ↓
         </div>
@@ -192,12 +205,19 @@
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- 2. HEADER INTERFACE UPDATEN ---
+        // --- 2. HEADER INTERFACE UPDATEN & COUNTDOWN MANAGEMENT ---
+        let redirectTimeout;
+        let redirectInterval;
+
         function updateUserHeader(user) {
             const authArea = document.getElementById('authArea');
+            const guestButtons = document.getElementById('guestButtons');
+            const authenticatedView = document.getElementById('authenticatedView');
+
             if (user) {
                 const displayName = user.user_metadata?.full_name || user.email;
 
+                // Header auf "Eingeloggt" setzen
                 authArea.innerHTML = `
                     <div class="flex items-center space-x-3 bg-zinc-900/80 border border-zinc-800 px-3 py-1 rounded-lg">
                         <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -207,18 +227,53 @@
                         </button>
                     </div>
                 `;
+
+                // Buttons in der Hero-Section tauschen
+                if (guestButtons && authenticatedView && authenticatedView.classList.contains('hidden')) {
+                    guestButtons.classList.add('hidden');
+                    authenticatedView.classList.remove('hidden');
+                    startDashboardCountdown();
+                }
             } else {
+                // Header zurücksetzen
                 authArea.innerHTML = `
                     <button id="loginBtn" onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
                         Login
                     </button>
                 `;
+
+                // Buttons zurücksetzen, falls ausgeloggt wird
+                if (guestButtons && authenticatedView) {
+                    guestButtons.classList.remove('hidden');
+                    authenticatedView.classList.add('hidden');
+                    clearInterval(redirectInterval);
+                    clearTimeout(redirectTimeout);
+                }
             }
         }
 
-        // --- 3. DYNAMISCHER AUTH CHECKER ---
+        // --- 3. COUNTDOWN TIMER LOGIK ---
+        function startDashboardCountdown() {
+            let secondsLeft = 5;
+            const timerDisplay = document.getElementById('countdownTimer');
+
+            redirectInterval = setInterval(() => {
+                secondsLeft--;
+                if (timerDisplay) {
+                    timerDisplay.textContent = secondsLeft;
+                }
+                if (secondsLeft <= 0) {
+                    clearInterval(redirectInterval);
+                }
+            }, 1000);
+
+            redirectTimeout = setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 5000);
+        }
+
+        // --- 4. DYNAMISCHER AUTH CHECKER ---
         function initAuthCheck() {
-            // Check beim direkten Laden der Seite
             _supabase.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
                     updateUserHeader(session.user);
@@ -226,7 +281,6 @@
                 }
             });
 
-            // Lauscher für OAuth-Redirect-Events im Live-Betrieb
             _supabase.auth.onAuthStateChange((event, session) => {
                 if (session) {
                     updateUserHeader(session.user);
@@ -237,15 +291,16 @@
             });
         }
 
-        // Hilfsfunktion: Säubert die lange URL im Browser
         function cleanUrlHash() {
             if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token') || window.location.hash.includes('error'))) {
                 window.history.replaceState(null, null, window.location.pathname);
             }
         }
 
-        // --- 4. LOGOUT EXECUTION ---
+        // --- 5. LOGOUT EXECUTION ---
         async function handleLogout() {
+            clearInterval(redirectInterval);
+            clearTimeout(redirectTimeout);
             const { error } = await _supabase.auth.signOut();
             if (error) {
                 alert("Fehler beim Abmelden: " + error.message);
@@ -254,7 +309,7 @@
             }
         }
 
-        // --- 5. SPRACH-LOGIK ---
+        // --- 6. SPRACH-LOGIK ---
         const translations = document.querySelectorAll('[data-lang-de]');
         let currentLang = 'de';
         
@@ -270,9 +325,7 @@
             document.getElementById('langSwitcher').value = lang;
         }
 
-        // Initialisierung beim Seitenstart
         window.addEventListener('DOMContentLoaded', () => {
-            // Check Sprache
             const browserLang = navigator.language || navigator.userLanguage;
             if (!browserLang.startsWith('de')) {
                 changeLanguage('en');
@@ -280,11 +333,10 @@
                 changeLanguage('de');
             }
 
-            // Starte den dynamischen Auth-Check
             initAuthCheck();
         });
 
-        // --- 6. SCROLL-ANIMATION ---
+        // --- 7. SCROLL-ANIMATION ---
         const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
         const checkScroll = () => {
             const triggerBottom = window.innerHeight / 5 * 4.5;
@@ -300,7 +352,6 @@
         window.addEventListener('scroll', checkScroll);
         checkScroll();
 
-        // --- 7. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
         function redirectToAuth(mode, role = 'pilot') {
             window.location.href = `login.html?mode=${mode}&role=${role}`;
         }
