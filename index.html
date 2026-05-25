@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeSky VA - Professional Virtual Airline Platform</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#000000',
+                        zincBase: '#09090b',
+                        vercelBlue: '#0070f3',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Verhindert automatische Bindestriche */
+        * {
+            hyphens: none !important;
+            -webkit-hyphens: none !important;
+            -ms-hyphens: none !important;
+        }
+
+        /* Erste Sektion: Hintergrundbild fixieren */
+        .bg-airplane {
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('airplane01.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Neue, krasse 3D-Zoom-Animation aus dem Hintergrund heraus */
+        .scroll-zoom-reveal {
+            opacity: 0;
+            transform: scale(0.85) translateY(40px); /* Startet kleiner (im Hintergrund) und weiter unten */
+            filter: blur(4px); /* Leicht unscharf im Hintergrund */
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                        filter 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity, filter;
+        }
+
+        /* Zustand, wenn die Sektion reingeflogen ist */
+        .scroll-zoom-reveal.active {
+            opacity: 1;
+            transform: scale(1) translateY(0); /* Fliegt auf Normalgröße nach vorne */
+            filter: blur(0); /* Wird perfekt scharf */
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-white font-sans min-h-screen antialiased overflow-x-hidden">
+
+    <section class="bg-airplane min-h-screen flex flex-col justify-between">
+        <header class="border-b border-zinc-800/50 px-6 py-4 flex justify-between items-center max-w-7xl mx-auto w-full backdrop-blur-md bg-black/40 sticky top-0 z-50">
+            <div class="flex items-center space-x-3">
+                <img src="logo.png" alt="FreeSky Logo" class="w-8 h-8 object-contain">
+                <span class="text-lg font-bold tracking-wider text-white">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative inline-block text-left">
+                    <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-zinc-900 border border-zinc-800 text-gray-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-700 cursor-pointer appearance-none pr-6 relative">
+                        <option value="de">🇩🇪 DE</option>
+                        <option value="en">🇺🇸 EN</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 text-[10px]">▼</div>
+                </div>
+
+                <button class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
+                    Login
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto py-12">
+            <h1 class="text-4xl md:text-6xl font-medium tracking-tight mb-6">
+                <span data-lang-de="Deine eigene Virtual Airline." data-lang-en="Your own Virtual Airline.">Deine eigene Virtual Airline.</span><br>
+                <span class="text-vercelBlue" data-lang-de="100% kostenlos." data-lang-en="100% free.">100% kostenlos.</span>
+            </h1>
+            
+            <p class="text-zinc-400 text-base md:text-lg max-w-2xl mb-10 leading-relaxed font-light" data-lang-de="Gründe deine eigene Fluggesellschaft für den Microsoft Flight Simulator. Verwalte deine Mitglieder und fliege gemeinsam mit einer professionellen Community – komplett ohne Kosten." data-lang-en="Create your own airline for Microsoft Flight Simulator. Manage your members and fly together with a professional community – completely free of charge.">
+                Gründe deine eigene Fluggesellschaft für den Microsoft Flight Simulator. Verwalte deine Mitglieder und fliege gemeinsam mit einer professionellen Community – komplett ohne Kosten.
+            </p>
+
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full justify-center px-6">
+                <button class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
+                    Airline gründen
+                </button>
+                <button class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
+                    Als Pilot beitreten
+                </button>
+            </div>
+        </main>
+        <div class="pb-8 text-center animate-bounce text-zinc-500 text-xs tracking-widest hidden md:block uppercase font-medium">
+            Scroll ↓
+        </div>
+    </section>
+
+
+    <section class="bg-white text-black py-32 px-6 scroll-zoom-reveal">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-20">
+                <span class="text-vercelBlue font-semibold text-xs tracking-widest uppercase">Management Hub</span>
+                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mt-2" data-lang-de="Alles im Griff. Bis zu 100 Mitglieder." data-lang-en="Full Control. Up to 100 Members.">Alles im Griff. Bis zu 100 Mitglieder.</h2>
+                <p class="text-zinc-500 mt-4 max-w-xl mx-auto text-base font-light" data-lang-de="Egal ob du eine kleine Chartergesellschaft oder eine internationale Allianz aufbauen willst – unsere Verwaltungs-Tools geben dir die volle Kontrolle." data-lang-en="Whether you want to build a small charter company or an international alliance – our management tools give you full control.">
+                    Egal ob du eine kleine Chartergesellschaft oder eine internationale Allianz aufbauen willst – unsere Verwaltungs-Tools geben dir die volle Kontrolle.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="space-y-10">
+                    <div class="flex items-start space-x-4">
+                        <div class="text-vercelBlue text-xl mt-1">✓</div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-1" data-lang-de="CEO Dashboard" data-lang-en="CEO Dashboard">CEO Dashboard</h3>
+                            <p class="text-zinc-600 text-sm leading-relaxed font-light" data-lang-de="Akzeptiere neue Piloten mit einem Klick, lade eigene Airline-Logos hoch und bestimme die Regeln deiner Fluggesellschaft." data-lang-en="Accept new pilots with one click, upload custom airline logos, and define the rules of your fleet.">Akzeptiere neue Piloten mit einem Klick, lade eigene Airline-Logos hoch und bestimme die Regeln deiner Fluggesellschaft.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="text-vercelBlue text-xl mt-1">✓</div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-1" data-lang-de="Echte Finanzen & Statistiken" data-lang-en="Real Finances & Statistics">Echte Finanzen & Statistiken</h3>
+                            <p class="text-zinc-600 text-sm leading-relaxed font-light" data-lang-de="Verdiene virtuelles Geld durch erfolgreiche Flüge deiner Piloten. Bezahle Treibstoff und behalte die Ausgaben im Auge." data-lang-en="Earn virtual money through successful flights by your pilots. Pay for fuel and keep track of expenses.">Verdiene virtuelles Geld durch erfolgreiche Flüge deiner Piloten. Bezahle Treibstoff und behalte die Ausgaben im Auge.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-50 border border-zinc-200/80 p-8 rounded-lg shadow-sm font-sans">
+                    <div class="flex items-center justify-between border-b border-zinc-200 pb-4 mb-4">
+                        <span class="font-medium text-xs text-zinc-400 uppercase tracking-wider" data-lang-de="Live Status" data-lang-en="Live Status">Live Status</span>
+                        <span class="w-2 h-2 bg-zinc-400 rounded-full"></span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between py-2 border-b border-zinc-100"><span class="text-zinc-500" data-lang-de="Aktive Piloten" data-lang-en="Active Pilots">Aktive Piloten</span><span class="font-medium text-zinc-900">42 / 100</span></div>
+                        <div class="flex justify-between py-2 border-b border-zinc-100"><span class="text-zinc-500" data-lang-de="Absolvierte Flüge" data-lang-en="Completed Flights">Absolvierte Flüge</span><span class="font-medium text-zinc-900">1,248</span></div>
+                        <div class="flex justify-between py-2"><span class="text-zinc-500" data-lang-de="Plattform Kosten" data-lang-en="Platform Costs">Plattform Kosten</span><span class="font-medium text-vercelBlue">0.00 EUR</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="bg-zincBase text-white py-32 px-6 border-t border-zinc-900 scroll-zoom-reveal">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="bg-black border border-zinc-800/80 p-8 rounded-lg font-mono text-xs text-zinc-400">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
+                        <span class="text-vercelBlue">SYSTEM_READY</span>
+                        <span>v1.0.0</span>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="flex justify-between"><span>ALTITUDE:</span> <span class="text-white">34,000 FT</span></p>
+                        <p class="flex justify-between"><span>AIRSPEED:</span> <span class="text-white">420 KT</span></p>
+                        <p class="flex justify-between"><span>FUEL FLOW:</span> <span class="text-white">2,400 LBS/HR</span></p>
+                        <p class="flex justify-between text-white border-t border-zinc-900 pt-2 font-bold"><span>LANDING RATE:</span> <span>-120 FT/MIN</span></p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <span class="text-vercelBlue font-semibold text-xs tracking-widest uppercase" data-lang-de="Automatisches Tracking" data-lang-en="Automated Tracking">Automatisches Tracking</span>
+                    <h2 class="text-3xl font-semibold tracking-tight" data-lang-de="Unser kostenloser ACARS-Tracker" data-lang-en="Our Free ACARS Tracker">Unser kostenloser ACARS-Tracker</h2>
+                    <p class="text-zinc-400 text-sm leading-relaxed font-light" data-lang-de="Keine manuelle Flugbucheintragung mehr nötig. Unser leichtes Desktop-Tool verbindet sich direkt mit deinem Simulator, zeichnet alle Flugdaten vollautomatisch auf und übermittelt sie fehlerfrei an dein Dashboard." data-lang-en="No manual logbook entries required. Our lightweight desktop tool connects directly to your simulator, records all flight data automatically, and transfers it flawlessly to your dashboard.">
+                        Keine manuelle Flugbucheintragung mehr nötig. Unser leichtes Desktop-Tool verbindet sich direkt mit deinem Simulator, zeichnet alle Flugdaten vollautomatisch auf und übermittelt sie fehlerfrei an dein Dashboard.
+                    </p>
+                    <div class="pt-2">
+                        <span class="text-xs text-zinc-500 border border-zinc-800 px-3 py-1.5 rounded" data-lang-de="Unterstützt MSFS 2020 & MSFS 2024" data-lang-en="Supports MSFS 2020 & MSFS 2024">
+                            Unterstützt MSFS 2020 & MSFS 2024
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="bg-black border-t border-zinc-900 py-12 text-zinc-600 text-xs">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <span class="font-medium tracking-wider text-zinc-400">FREESKY VA</span>
+            <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // 1. SPRACH-LOGIK
+        const translations = document.querySelectorAll('[data-lang-de]');
+        
+        function changeLanguage(lang) {
+            translations.forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-lang-en');
+                } else {
+                    el.textContent = el.getAttribute('data-lang-de');
+                }
+            });
+            document.getElementById('langSwitcher').value = lang;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (!browserLang.startsWith('de')) {
+                changeLanguage('en');
+            } else {
+                changeLanguage('de');
+            }
+        });
+
+        // 2. ERWEITERTE SCROLL-ZOOM-ANIMATION (Fading & Scaling)
+        const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
+        
+        const checkScroll = () => {
+            // Die Animation startet, sobald die Sektion das untere Fünftel des Bildschirms erreicht
+            const triggerBottom = window.innerHeight / 5 * 4.5;
+            
+            zoomSections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                if (sectionTop < triggerBottom) {
+                    section.classList.add('active');
+                } else {
+                    // Optional: Entfernt die Klasse wieder, wenn man hochscrollt, 
+                    // damit es beim erneuten Runterscrollen wieder reinfliegt!
+                    section.classList.remove('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', checkScroll);
+        checkScroll(); // Direkt einmal ausführen
+    </script>
+
+</body>
+</html>
