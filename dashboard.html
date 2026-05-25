@@ -33,7 +33,10 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <span id="userEmail" class="text-xs text-zinc-400">Lade Profil...</span>
+                <div onclick="toggleSettingsModal(true)" class="flex items-center space-x-2 cursor-pointer group bg-zinc-900/40 border border-zinc-800/60 px-3 py-1.5 rounded-lg hover:border-zinc-700 transition">
+                    <span id="userEmail" class="text-xs text-zinc-400 group-hover:text-zinc-200">Lade Profil...</span>
+                    <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
                 <button onclick="handleLogout()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
                     Abmelden
                 </button>
@@ -44,7 +47,7 @@
     <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
         
         <div class="mb-10 border-b border-zinc-900 pb-6">
-            <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Willkommen im Cockpit</h1>
+            <h1 id="welcomeHeading" class="text-2xl md:text-3xl font-semibold tracking-tight">Willkommen im Cockpit</h1>
             <p id="roleBadge" class="text-zinc-500 text-xs mt-1 uppercase tracking-wider font-medium">Rolle: <span class="text-vercelBlue">—</span></p>
         </div>
 
@@ -54,7 +57,11 @@
         </div>
 
         <div id="pilotDashboard" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Heimatbasis</span>
+                    <h3 id="statsHomeBase" class="text-2xl font-semibold mt-1">—</h3>
+                </div>
                 <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
                     <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Gesamte Flugzeit</span>
                     <h3 class="text-2xl font-semibold mt-1">0.0 Std</h3>
@@ -92,27 +99,42 @@
                     <h3 class="text-2xl font-semibold mt-1">0 Flugzeuge</h3>
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Bewerbungen (Piloten-Anträge)</h2>
-                    <div class="text-center py-6 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
-                        Keine offenen Bewerbungen vorhanden.
-                    </div>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Airline-Einstellungen</h2>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Name der Fluggesellschaft</label>
-                            <input type="text" id="airlineNameDisplay" readonly class="w-full bg-black border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-400 outline-none">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </main>
+
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-zincBase border border-zinc-800 w-full max-w-md rounded-xl shadow-2xl p-6 overflow-hidden transform transition-all">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-5">
+                <h3 class="text-base font-semibold tracking-tight">Account Einstellungen</h3>
+                <button onclick="toggleSettingsModal(false)" class="text-zinc-500 hover:text-white transition text-sm">✕</button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rufname / Voller Name</label>
+                    <input type="text" id="setFullName" placeholder="z.B. Max Mustermann" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                </div>
+                <div>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Username / Pilot ID</label>
+                    <input type="text" id="setUsername" placeholder="z.B. MUX134" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                </div>
+                <div>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
+                    <input type="text" id="setHomeBase" placeholder="z.B. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-800">
+                <button onclick="toggleSettingsModal(false)" class="bg-transparent text-zinc-400 hover:text-white text-xs px-4 py-2 transition">
+                    Abbrechen
+                </button>
+                <button onclick="saveProfileData()" class="bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs px-4 py-2 rounded-md transition">
+                    Speichern
+                </button>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
         <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
@@ -121,42 +143,118 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInRefiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
 
-        // --- 2. SECURITY CHECK: EINGELOGGT ODER NICHT? ---
+        // --- 2. SECURITY CHECK & PROFIL LADEN ---
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session }, error } = await _supabase.auth.getSession();
             
             if (error || !session) {
-                // Nicht eingeloggt? Sofort zurück zur Login-Seite kicken!
                 window.location.href = 'login.html';
                 return;
             }
 
-            // User-E-Mail in der Navigation anzeigen
-            document.getElementById('userEmail').textContent = session.user.email;
+            currentUser = session.user;
+            document.getElementById('userEmail').textContent = currentUser.email;
 
-            // Metadaten auslesen (Rolle und Airline-Name)
-            const userMetadata = session.user.user_metadata;
-            const role = userMetadata?.role || 'pilot'; // Fallback auf Pilot, falls nichts gesetzt
+            // Rollen-Metadaten holen
+            const userMetadata = currentUser.user_metadata;
+            const role = userMetadata?.role || 'pilot';
             const airlineName = userMetadata?.airline_name || 'Keine Airline';
 
-            // UI-Weiche umschalten
+            // UI-Weiche steuern
             document.getElementById('loadingState').classList.add('hidden');
             
             if (role === 'ceo') {
                 document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">CEO</span> | Airline: <span class="text-zinc-300">${airlineName}</span>`;
                 document.getElementById('ceoDashboard').classList.remove('hidden');
-                document.getElementById('airlineNameDisplay').value = airlineName;
             } else {
                 document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">Pilot</span>`;
                 document.getElementById('pilotDashboard').classList.remove('hidden');
             }
+
+            // Profildaten aus der Custom-Datenbank abrufen
+            await loadUserProfile();
         });
 
-        // --- 3. LOGOUT ABSCHLIESSEN ---
+        // --- 3. PROFIL AUS TABELLE LADEN ---
+        async function loadUserProfile() {
+            if (!currentUser) return;
+
+            let { data: profile, error } = await _supabase
+                .from('profiles')
+                .select('username, full_name, home_base')
+                .eq('id', currentUser.id)
+                .single();
+
+            // Falls noch kein Eintrag existiert, legen wir einen leeren an
+            if (error && error.code === 'PGRST116') {
+                const { data: newProfile, error: insertError } = await _supabase
+                    .from('profiles')
+                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '' }])
+                    .select()
+                    .single();
+                
+                if (!insertError) profile = newProfile;
+            }
+
+            if (profile) {
+                // UI anpassen mit Profildaten
+                if (profile.full_name) {
+                    document.getElementById('welcomeHeading').textContent = `Willkommen im Cockpit, ${profile.full_name}`;
+                }
+                if (profile.home_base) {
+                    document.getElementById('statsHomeBase').textContent = profile.home_base.toUpperCase();
+                }
+
+                // Inputs im Modal vorausfüllen
+                document.getElementById('setFullName').value = profile.full_name || '';
+                document.getElementById('setUsername').value = profile.username || '';
+                document.getElementById('setHomeBase').value = profile.home_base || '';
+            }
+        }
+
+        // --- 4. PROFIL SPEICHERN ---
+        async function saveProfileData() {
+            if (!currentUser) return;
+
+            const fullNameValue = document.getElementById('setFullName').value;
+            const usernameValue = document.getElementById('setUsername').value;
+            const homeBaseValue = document.getElementById('setHomeBase').value.toUpperCase();
+
+            const { error } = await _supabase
+                .from('profiles')
+                .update({
+                    full_name: fullNameValue,
+                    username: usernameValue,
+                    home_base: homeBaseValue,
+                    updated_at: new Date()
+                })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                alert("Fehler beim Speichern: " + error.message);
+            } else {
+                toggleSettingsModal(false);
+                // Benutzeroberfläche live aktualisieren ohne Neuladen
+                await loadUserProfile();
+            }
+        }
+
+        // --- 5. MODAL INTERACTION ---
+        function toggleSettingsModal(show) {
+            const modal = document.getElementById('settingsModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // --- 6. LOGOUT ABSCHLIESSEN ---
         async function handleLogout() {
             await _supabase.auth.signOut();
             window.location.href = 'index.html';
