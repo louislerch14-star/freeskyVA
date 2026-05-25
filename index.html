@@ -188,7 +188,7 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -239,7 +239,7 @@
 
         // Hilfsfunktion: Säubert die lange URL im Browser
         function cleanUrlHash() {
-            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token'))) {
+            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token') || window.location.hash.includes('error'))) {
                 window.history.replaceState(null, null, window.location.pathname);
             }
         }
