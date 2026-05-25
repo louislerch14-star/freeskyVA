@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - FreeSky VA</title>
+    <title>Profilübersicht - FreeSky VA</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +33,8 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <div onclick="toggleSettingsModal(true)" class="flex items-center space-x-2 cursor-pointer group bg-zinc-900/40 border border-zinc-800/60 px-3 py-1.5 rounded-lg hover:border-zinc-700 transition">
+                <div onclick="toggleSettingsModal(true)" class="flex items-center space-x-3 cursor-pointer group bg-zinc-900/40 border border-zinc-800/60 px-3 py-1.5 rounded-lg hover:border-zinc-700 transition">
+                    <img id="navAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FreeSky" alt="Avatar" class="w-5 h-5 rounded-full border border-zinc-750 bg-zinc-800">
                     <span id="userEmail" class="text-xs text-zinc-400 group-hover:text-zinc-200">Lade Profil...</span>
                     <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </div>
@@ -46,82 +47,103 @@
 
     <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
         
-        <div class="mb-10 border-b border-zinc-900 pb-6">
-            <h1 id="welcomeHeading" class="text-2xl md:text-3xl font-semibold tracking-tight">Willkommen im Cockpit</h1>
-            <p id="roleBadge" class="text-zinc-500 text-xs mt-1 uppercase tracking-wider font-medium">Rolle: <span class="text-vercelBlue">—</span></p>
-        </div>
-
         <div id="loadingState" class="text-center py-20">
             <div class="inline-block w-6 h-6 border-2 border-vercelBlue border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-zinc-500 text-xs mt-2">Daten werden synchronisiert...</p>
+            <p class="text-zinc-500 text-xs mt-2">Profil wird geladen...</p>
         </div>
 
-        <div id="pilotDashboard" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Heimatbasis</span>
-                    <h3 id="statsHomeBase" class="text-2xl font-semibold mt-1">—</h3>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Gesamte Flugzeit</span>
-                    <h3 class="text-2xl font-semibold mt-1">0.0 Std</h3>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Absolvierte Flüge</span>
-                    <h3 class="text-2xl font-semibold mt-1">0</h3>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Durchschnittliche Landung</span>
-                    <h3 class="text-2xl font-semibold mt-1">— fpm</h3>
+        <div id="profileOverviewContent" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="space-y-6">
+                <div class="bg-zincBase border border-zinc-800/80 rounded-xl p-6 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span>Standby</span>
+                    </div>
+
+                    <div class="w-24 h-24 rounded-full border-2 border-zinc-800 bg-zinc-900 p-1 mb-4 group relative">
+                        <img id="profileAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FreeSky" alt="Pilot Avatar" class="w-full h-full rounded-full object-cover">
+                    </div>
+
+                    <h2 id="viewFullName" class="text-xl font-semibold tracking-tight">Flugschüler</h2>
+                    <p id="viewUsername" class="text-zinc-500 text-xs font-mono mt-0.5">@FS_Pilot</p>
+                    
+                    <div id="roleBadgeView" class="mt-3 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-vercelBlue uppercase">
+                        PILOT
+                    </div>
+
+                    <div class="w-full text-left border-t border-zinc-900 mt-6 pt-4">
+                        <h4 class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mb-2">Über mich & Hobbys</h4>
+                        <p id="viewBio" class="text-zinc-500 text-xs leading-relaxed italic font-light">
+                            Keine Biografie hinterlegt. Klicke oben rechts auf dein Profil, um etwas über dich oder deine Hobbys (wie Flight-Simming, Programmieren, etc.) zu erzählen!
+                        </p>
+                    </div>
+
+                    <button onclick="toggleSettingsModal(true)" class="w-full mt-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition py-2 text-xs font-medium rounded-lg">
+                        Profil bearbeiten
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Deine letzten Flüge</h2>
-                <div class="text-center py-8 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
-                    Noch keine aufgezeichneten Flüge vorhanden. Starte den ACARS-Tracker, um abzuheben!
+            <div class="lg:grid-cols-1 lg:col-span-2 space-y-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Heimatbasis</span>
+                        <h3 id="statsHomeBase" class="text-xl font-semibold mt-1">—</h3>
+                    </div>
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Rang</span>
+                        <h3 class="text-xl font-semibold mt-1 text-zinc-300">Cadet</h3>
+                    </div>
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Flugzeit</span>
+                        <h3 class="text-xl font-semibold mt-1">0.0 Std</h3>
+                    </div>
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Lieblingsmuster</span>
+                        <h3 class="text-xl font-semibold mt-1 text-zinc-400">A320 / B737</h3>
+                    </div>
+                </div>
+
+                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
+                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Letzte Flugbucheinträge</h2>
+                    <div class="text-center py-12 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
+                        Noch keine aufgezeichneten Flüge in der Akte vorhanden.
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="ceoDashboard" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Airline-Finanzen</span>
-                    <h3 class="text-2xl font-semibold mt-1 text-emerald-400">v$ 500.000</h3>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Angestellte Piloten</span>
-                    <h3 class="text-2xl font-semibold mt-1">1 (Du)</h3>
-                </div>
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Flotten-Status</span>
-                    <h3 class="text-2xl font-semibold mt-1">0 Flugzeuge</h3>
-                </div>
-            </div>
         </div>
-
     </main>
 
     <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-zincBase border border-zinc-800 w-full max-w-md rounded-xl shadow-2xl p-6 overflow-hidden transform transition-all">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-5">
-                <h3 class="text-base font-semibold tracking-tight">Account Einstellungen</h3>
+                <h3 class="text-base font-semibold tracking-tight">Profil gestalten</h3>
                 <button onclick="toggleSettingsModal(false)" class="text-zinc-500 hover:text-white transition text-sm">✕</button>
             </div>
 
             <div class="space-y-4">
                 <div>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Profilbild (Avatar-Name oder Bild-URL)</label>
+                    <input type="text" id="setAvatarUrl" placeholder="z.B. PilotMax oder Link zu einem Bild" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    <p class="text-[10px] text-zinc-600 mt-1">Tipp: Gib einfach irgendein Wort ein, um ein individuelles Icon zu generieren!</p>
+                </div>
+                <div>
                     <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rufname / Voller Name</label>
                     <input type="text" id="setFullName" placeholder="z.B. Max Mustermann" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
                 </div>
                 <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Username / Pilot ID</label>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Pilot ID / Username</label>
                     <input type="text" id="setUsername" placeholder="z.B. MUX134" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
                 </div>
                 <div>
                     <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
                     <input type="text" id="setHomeBase" placeholder="z.B. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                </div>
+                <div>
+                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Über mich & Hobbys (Optional)</label>
+                    <textarea id="setBio" rows="3" placeholder="Erzähle der Community was über dich, deine Sim-Hardware oder Hobbys..." class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none resize-none transition"></textarea>
                 </div>
             </div>
 
@@ -130,7 +152,7 @@
                     Abbrechen
                 </button>
                 <button onclick="saveProfileData()" class="bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs px-4 py-2 rounded-md transition">
-                    Speichern
+                    Änderungen speichern
                 </button>
             </div>
         </div>
@@ -143,12 +165,12 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInRefiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkdndlaG1hcnFqZGRkdWxhc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjkxMDgsImV4cCI6MjA5NTMwNTEwOH0.bvOksEk4B0Uqbp7MEASGgUCoSmx_SecyRMVQcPVqRWg";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
-        // --- 2. SECURITY CHECK & PROFIL LADEN ---
+        // --- 2. SECURITY CHECK beim Laden ---
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session }, error } = await _supabase.auth.getSession();
             
@@ -165,16 +187,19 @@
             const role = userMetadata?.role || 'pilot';
             const airlineName = userMetadata?.airline_name || 'Keine Airline';
 
-            // UI-Weiche steuern
-            document.getElementById('loadingState').classList.add('hidden');
-            
+            // Rollen-Badge links befüllen
+            const rBadge = document.getElementById('roleBadgeView');
             if (role === 'ceo') {
-                document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">CEO</span> | Airline: <span class="text-zinc-300">${airlineName}</span>`;
-                document.getElementById('ceoDashboard').classList.remove('hidden');
+                rBadge.textContent = 'CEO';
+                rBadge.className = 'mt-3 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-emerald-400 uppercase';
             } else {
-                document.getElementById('roleBadge').innerHTML = `Rolle: <span class="text-vercelBlue font-bold">Pilot</span>`;
-                document.getElementById('pilotDashboard').classList.remove('hidden');
+                rBadge.textContent = 'PILOT';
+                rBadge.className = 'mt-3 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-vercelBlue uppercase';
             }
+
+            // Lade-Zustand beenden und UI einblenden
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('profileOverviewContent').classList.remove('hidden');
 
             // Profildaten aus der Custom-Datenbank abrufen
             await loadUserProfile();
@@ -186,15 +211,15 @@
 
             let { data: profile, error } = await _supabase
                 .from('profiles')
-                .select('username, full_name, home_base')
+                .select('username, full_name, home_base, avatar_url, bio')
                 .eq('id', currentUser.id)
                 .single();
 
-            // Falls noch kein Eintrag existiert, legen wir einen leeren an
+            // Falls noch kein Eintrag existiert, legen wir ein leeres Profil an
             if (error && error.code === 'PGRST116') {
                 const { data: newProfile, error: insertError } = await _supabase
                     .from('profiles')
-                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '' }])
+                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '', avatar_url: '', bio: '' }])
                     .select()
                     .single();
                 
@@ -202,18 +227,39 @@
             }
 
             if (profile) {
-                // UI anpassen mit Profildaten
-                if (profile.full_name) {
-                    document.getElementById('welcomeHeading').textContent = `Willkommen im Cockpit, ${profile.full_name}`;
-                }
+                // UI Karten-Werte aktualisieren
+                document.getElementById('viewFullName').textContent = profile.full_name || 'Flugschüler / Unbekannt';
+                document.getElementById('viewUsername').textContent = profile.username ? `@${profile.username}` : '@pilot';
+                
                 if (profile.home_base) {
                     document.getElementById('statsHomeBase').textContent = profile.home_base.toUpperCase();
+                } else {
+                    document.getElementById('statsHomeBase').textContent = '—';
                 }
 
-                // Inputs im Modal vorausfüllen
+                if (profile.bio) {
+                    document.getElementById('viewBio').textContent = profile.bio;
+                    document.getElementById('viewBio').classList.remove('italic', 'text-zinc-600');
+                    document.getElementById('viewBio').classList.add('text-zinc-400');
+                }
+
+                // Avatar-Logik: Nutzt Dicebear Avatare falls keine HTTP URL eingetragen ist
+                let finalAvatarSrc = "https://api.dicebear.com/7.x/bottts/svg?seed=" + (profile.username || currentUser.id);
+                if (profile.avatar_url && profile.avatar_url.startsWith('http')) {
+                    finalAvatarSrc = profile.avatar_url;
+                } else if (profile.avatar_url) {
+                    finalAvatarSrc = "https://api.dicebear.com/7.x/bottts/svg?seed=" + profile.avatar_url;
+                }
+
+                document.getElementById('profileAvatar').src = finalAvatarSrc;
+                document.getElementById('navAvatar').src = finalAvatarSrc;
+
+                // Inputs im Einstellungs-Modal vorausfüllen
                 document.getElementById('setFullName').value = profile.full_name || '';
                 document.getElementById('setUsername').value = profile.username || '';
                 document.getElementById('setHomeBase').value = profile.home_base || '';
+                document.getElementById('setAvatarUrl').value = profile.avatar_url || '';
+                document.getElementById('setBio').value = profile.bio || '';
             }
         }
 
@@ -224,6 +270,8 @@
             const fullNameValue = document.getElementById('setFullName').value;
             const usernameValue = document.getElementById('setUsername').value;
             const homeBaseValue = document.getElementById('setHomeBase').value.toUpperCase();
+            const avatarUrlValue = document.getElementById('setAvatarUrl').value;
+            const bioValue = document.getElementById('setBio').value;
 
             const { error } = await _supabase
                 .from('profiles')
@@ -231,6 +279,8 @@
                     full_name: fullNameValue,
                     username: usernameValue,
                     home_base: homeBaseValue,
+                    avatar_url: avatarUrlValue,
+                    bio: bioValue,
                     updated_at: new Date()
                 })
                 .eq('id', currentUser.id);
@@ -239,7 +289,6 @@
                 alert("Fehler beim Speichern: " + error.message);
             } else {
                 toggleSettingsModal(false);
-                // Benutzeroberfläche live aktualisieren ohne Neuladen
                 await loadUserProfile();
             }
         }
@@ -254,7 +303,7 @@
             }
         }
 
-        // --- 6. LOGOUT ABSCHLIESSEN ---
+        // --- 6. LOGOUT EXECUTION ---
         async function handleLogout() {
             await _supabase.auth.signOut();
             window.location.href = 'index.html';
