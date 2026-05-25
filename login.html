@@ -103,17 +103,23 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        // HINWEIS: Ersetze diesen Key durch deinen echten "anon / public" Key (beginnt meistens mit eyJhbGci...)
+        // Fix des korrekten Keys (v statt V)
         const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
         
-        // Fix: Variable umbenannt, um Namenskonflikt mit der Library zu vermeiden
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let modalMode = 'login'; 
         let selectedRole = 'pilot';
 
-        // --- 2. URL PARAMETER AUSLESEN BEIM LADEN ---
-        window.addEventListener('DOMContentLoaded', () => {
+        // --- 2. SESSION-CHECK & PARAMETER AUSLESEN ---
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Falls der User bereits eingeloggt ist, direkt zur Startseite schicken
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode') || 'login';
             const role = urlParams.get('role') || 'pilot';
@@ -200,7 +206,6 @@
                 if (error) {
                     alert("Fehler: " + error.message);
                 } else {
-                    alert('Login erfolgreich!');
                     window.location.href = 'index.html';
                 }
             } else {
