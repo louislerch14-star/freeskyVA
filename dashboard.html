@@ -97,11 +97,11 @@
                     </div>
                     <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
                         <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Flugzeit</span>
-                        <h3 class="text-xl font-semibold mt-1">0.0 Std</h3>
+                        <h3 id="statsFlightHours" class="text-xl font-semibold mt-1">0.0 Std</h3>
                     </div>
                     <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
                         <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Lieblingsmuster</span>
-                        <h3 class="text-xl font-semibold mt-1 text-zinc-400">A320 / B737</h3>
+                        <h3 id="statsFavoriteAircraft" class="text-xl font-semibold mt-1 text-zinc-400">A320 / B737</h3>
                     </div>
                 </div>
 
@@ -130,22 +130,40 @@
                 <button onclick="toggleSettingsModal(false)" class="text-zinc-500 hover:text-white transition text-sm">✕</button>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
                 <div>
                     <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Profilbild hochladen</label>
                     <input type="file" id="avatarFileInput" accept="image/*" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-zinc-400 outline-none file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 transition">
                 </div>
-                <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rufname / Voller Name</label>
-                    <input type="text" id="setFullName" placeholder="z.B. Max Mustermann" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rufname / Name</label>
+                        <input type="text" id="setFullName" placeholder="Max Mustermann" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    </div>
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Pilot ID / Username</label>
+                        <input type="text" id="setUsername" placeholder="MUX134" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    </div>
                 </div>
-                <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Pilot ID / Username</label>
-                    <input type="text" id="setUsername" placeholder="z.B. MUX134" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
+                        <input type="text" id="setHomeBase" placeholder="e.g. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                    </div>
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Lieblingsmuster</label>
+                        <input type="text" id="setFavoriteAircraft" placeholder="A320 / B737" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    </div>
                 </div>
-                <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
-                    <input type="text" id="setHomeBase" placeholder="z.B. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Flugzeit (Stunden)</label>
+                        <input type="number" id="setFlightHours" step="0.1" min="0" placeholder="0.0" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    </div>
+                    <div>
+                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rang</label>
+                        <input type="text" id="setRank" placeholder="Cadet" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
+                    </div>
                 </div>
                 <div>
                     <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Über mich & Hobbys (Optional)</label>
@@ -158,7 +176,7 @@
                     Abbrechen
                 </button>
                 <button id="saveBtn" onclick="saveProfileData()" class="bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs px-4 py-2 rounded-md transition flex items-center">
-                    Änderungen speichern
+                    Änderungen保存 speichern
                 </button>
             </div>
         </div>
@@ -187,7 +205,6 @@
             currentUser = session.user;
             document.getElementById('userEmail').textContent = currentUser.email;
 
-            // Metadaten der Authentifizierung abfragen
             const userMetadata = currentUser.user_metadata;
             userRole = userMetadata?.role || 'pilot';
 
@@ -195,11 +212,9 @@
             if (userRole === 'ceo') {
                 rBadge.textContent = 'CEO';
                 rBadge.className = 'mt-3 bg-zinc-900 border border-emerald-500/20 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-emerald-400 uppercase';
-                document.getElementById('statsRank').textContent = 'Gründer';
             } else {
                 rBadge.textContent = 'PILOT';
                 rBadge.className = 'mt-3 bg-zinc-900 border border-vercelBlue/20 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-vercelBlue uppercase';
-                document.getElementById('statsRank').textContent = 'Cadet';
             }
 
             document.getElementById('loadingState').classList.add('hidden');
@@ -213,15 +228,14 @@
 
             let { data: profile, error } = await _supabase
                 .from('profiles')
-                .select('username, full_name, home_base, avatar_url, bio, airline_id')
+                .select('username, full_name, home_base, avatar_url, bio, airline_id, favorite_aircraft, flight_hours, rank')
                 .eq('id', currentUser.id)
                 .single();
 
-            // Automatische Generierung eines Eintrags, falls gelöscht oder neu
             if (error && error.code === 'PGRST116') {
                 const { data: newProfile, error: insertError } = await _supabase
                     .from('profiles')
-                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '', avatar_url: '', bio: '' }])
+                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '', avatar_url: '', bio: '', favorite_aircraft: 'A320 / B737', flight_hours: 0.0, rank: 'Cadet' }])
                     .select()
                     .single();
                 
@@ -229,14 +243,15 @@
             }
 
             if (profile) {
+                // UI Aktualisierungen für Texte
                 document.getElementById('viewFullName').textContent = profile.full_name || 'Flugschüler / Unbekannt';
                 document.getElementById('viewUsername').textContent = profile.username ? `@${profile.username}` : '@pilot';
+                document.getElementById('statsHomeBase').textContent = profile.home_base ? profile.home_base.toUpperCase() : '—';
                 
-                if (profile.home_base) {
-                    document.getElementById('statsHomeBase').textContent = profile.home_base.toUpperCase();
-                } else {
-                    document.getElementById('statsHomeBase').textContent = '—';
-                }
+                // Neue Felder in den Statistik-Karten einblenden
+                document.getElementById('statsRank').textContent = profile.rank || (userRole === 'ceo' ? 'Gründer' : 'Cadet');
+                document.getElementById('statsFlightHours').textContent = `${profile.flight_hours || '0.0'} Std`;
+                document.getElementById('statsFavoriteAircraft').textContent = profile.favorite_aircraft || 'A320 / B737';
 
                 if (profile.bio) {
                     document.getElementById('viewBio').textContent = profile.bio;
@@ -247,12 +262,11 @@
                     document.getElementById('viewBio').classList.add('italic', 'text-zinc-600');
                 }
 
-                // Bild-Zuweisung (Entweder Bucket-URL oder schicker Fallback-Avatar)
                 let finalAvatarSrc = profile.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=" + (profile.username || currentUser.id);
                 document.getElementById('profileAvatar').src = finalAvatarSrc;
                 document.getElementById('navAvatar').src = finalAvatarSrc;
 
-                // Airline Box dynamisch anpassen
+                // Airline Info Box
                 const airlineBox = document.getElementById('airlineStatusBox');
                 if (userRole === 'ceo') {
                     const airlineName = currentUser.user_metadata?.airline_name || 'Deine Airline';
@@ -264,7 +278,6 @@
                         <span class="text-zinc-600 text-[10px]">Hauptsitz</span>
                     </div>`;
                 } else if (profile.airline_id) {
-                    // Später holen wir hier über einen JOIN den echten Namen der Airline
                     airlineBox.innerHTML = `<p class="text-zinc-300">Angestellt bei Airline-ID: <span class="font-mono text-vercelBlue">${profile.airline_id}</span></p>`;
                 } else {
                     airlineBox.innerHTML = `<div class="border border-dashed border-zinc-800 p-4 text-center rounded-lg text-zinc-600">
@@ -272,11 +285,14 @@
                     </div>`;
                 }
 
-                // Inputs im Modal füllen
+                // Inputs im Modal mit bestehenden Werten füllen
                 document.getElementById('setFullName').value = profile.full_name || '';
                 document.getElementById('setUsername').value = profile.username || '';
                 document.getElementById('setHomeBase').value = profile.home_base || '';
                 document.getElementById('setBio').value = profile.bio || '';
+                document.getElementById('setFavoriteAircraft').value = profile.favorite_aircraft || 'A320 / B737';
+                document.getElementById('setFlightHours').value = profile.flight_hours || 0.0;
+                document.getElementById('setRank').value = profile.rank || '';
             }
         }
 
@@ -311,16 +327,23 @@
                 avatarUrlValue = data.publicUrl;
             }
 
+            // Alle Werte aus den Eingabefeldern auslesen
             const fullNameValue = document.getElementById('setFullName').value;
             const usernameValue = document.getElementById('setUsername').value;
             const homeBaseValue = document.getElementById('setHomeBase').value.toUpperCase();
             const bioValue = document.getElementById('setBio').value;
+            const favoriteAircraftValue = document.getElementById('setFavoriteAircraft').value;
+            const flightHoursValue = parseFloat(document.getElementById('setFlightHours').value) || 0.0;
+            const rankValue = document.getElementById('setRank').value;
 
             const updateData = {
                 full_name: fullNameValue,
                 username: usernameValue,
                 home_base: homeBaseValue,
                 bio: bioValue,
+                favorite_aircraft: favoriteAircraftValue,
+                flight_hours: flightHoursValue,
+                rank: rankValue,
                 updated_at: new Date()
             };
 
