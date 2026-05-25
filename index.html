@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeSky VA - Professional Flight Simulation</title>
+    <title>FreeSky VA - Professional Airline Simulation</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +23,13 @@
         }
     </script>
     <style>
-        /* Der dicke, fette Puls-Effekt für maximales Auffallen */
+        /* Custom Background & Animationen */
+        body {
+            background-image: radial-gradient(circle at 50% 50%, #111115 0%, #000000 100%);
+            background-attachment: fixed;
+        }
+
+        /* Der dicke, fette Puls-Effekt für den Registrierungs-Button */
         @keyframes pulseGlow {
             0%, 100% { transform: scale(1); box-shadow: 0 0 25px -3px rgba(0, 112, 243, 0.6); }
             50% { transform: scale(1.03); box-shadow: 0 0 40px 4px rgba(0, 112, 243, 0.9); }
@@ -31,9 +37,36 @@
         .leucht-button {
             animation: pulseGlow 2s infinite ease-in-out;
         }
+
+        /* Hintergrund-Animationen / Partikel-Effekte */
+        .animated-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(0, 112, 243, 0.15);
+            border-radius: 50%;
+            animation: floatParticles 8s infinite linear;
+        }
+        @keyframes floatParticles {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
     </style>
 </head>
-<body class="bg-darkBg text-white font-sans min-h-screen antialiased flex flex-col justify-between">
+<body class="text-white font-sans min-h-screen antialiased flex flex-col justify-between relative">
+
+    <div class="animated-bg">
+        <div class="particle" style="width: 40px; height: 40px; left: 15%; animation-delay: 0s; animation-duration: 12s;"></div>
+        <div class="particle" style="width: 20px; height: 20px; left: 45%; animation-delay: 2s; animation-duration: 9s;"></div>
+        <div class="particle" style="width: 50px; height: 50px; left: 75%; animation-delay: 5s; animation-duration: 15s;"></div>
+        <div class="particle" style="width: 30px; height: 30px; left: 85%; animation-delay: 1s; animation-duration: 7s;"></div>
+    </div>
 
     <header class="border-b border-zinc-800/80 bg-zincBase/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
@@ -42,11 +75,20 @@
                 <span class="text-base font-bold tracking-wider">FREESKY <span class="text-vercelBlue text-xs font-semibold">VA</span></span>
             </div>
             
-            <nav class="flex items-center space-x-4">
-                <div id="navAuthenticated" class="hidden flex items-center space-x-4">
-                    <a href="dashboard.html" class="text-xs bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-medium transition">
+            <nav class="flex items-center space-x-4 relative z-50">
+                <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1 text-xs text-zinc-400">
+                    <span class="cursor-pointer text-white font-bold px-1 hover:text-white transition">DE</span>
+                    <span class="text-zinc-700 px-0.5">|</span>
+                    <span class="cursor-pointer px-1 hover:text-zinc-200 transition">EN</span>
+                </div>
+
+                <div id="navAuthenticated" class="hidden flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-xs bg-vercelBlue border border-blue-600 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md font-medium transition shadow-md">
                         Zum Dashboard →
                     </a>
+                    <button onclick="handleLogout()" class="text-xs bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-white px-3 py-1.5 rounded-md font-medium transition">
+                        Abmelden
+                    </button>
                 </div>
                 
                 <div id="navGuest" class="hidden flex items-center space-x-2">
@@ -61,7 +103,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto w-full px-6 py-16 space-y-20 flex-grow">
+    <main class="max-w-7xl mx-auto w-full px-6 py-16 space-y-20 flex-grow relative z-10">
         
         <div class="text-center space-y-8 py-12 relative overflow-hidden">
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-vercelBlue/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -89,7 +131,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
             <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl space-y-3">
                 <div class="w-8 h-8 rounded-lg bg-vercelBlue/10 border border-vercelBlue/20 flex items-center justify-center text-vercelBlue">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -123,8 +165,8 @@
 
     </main>
 
-    <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
-        <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
+    <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center relative z-10">
+        <p>&copy; 2026 FreeSky VA. Professional Virtual Airline Systems.</p>
     </footer>
 
     <script>
@@ -141,11 +183,11 @@
             const heroBtn = document.getElementById('heroActionBtn');
 
             if (session) {
-                // User ist eingeloggt: Zeige Dashboard-Link in der Navbar
+                // User ist eingeloggt: Zeige Dashboard & Abmeldebutton in der Navbar
                 navAuth.classList.remove('hidden');
                 navGuest.classList.add('hidden');
 
-                // Verwandle den Hero-Button in eine unaufälligere Dashboard-Abkürzung
+                // Verwandle den Hero-Button in eine unauffällige Dashboard-Abkürzung
                 heroBtn.href = "dashboard.html";
                 heroBtn.innerHTML = `
                     <span>Flugbetrieb aufnehmen</span>
@@ -162,6 +204,12 @@
                 navAuth.classList.add('hidden');
             }
         });
+
+        // Abmelde-Funktion für die Navbar
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            window.location.reload(); // Neuladen, um den Gast-Zustand sofort anzuzeigen
+        }
     </script>
 </body>
 </html>
