@@ -186,22 +186,18 @@
     </footer>
 
     <script>
-        // --- 1. SUPABASE PROJEKT HOOLEN ---
+        // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J"; // Achte darauf, dass hier dein echter Key drinsteht
+        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- 2. LOGGED IN STATUS ÜBERPRÜFEN ---
-        async function checkUserSession() {
-            const { data: { session }, error } = await _supabase.auth.getSession();
+        // --- 2. HEADER INTERFACE UPDATEN ---
+        function updateUserHeader(user) {
             const authArea = document.getElementById('authArea');
+            if (user) {
+                const displayName = user.user_metadata?.full_name || user.email;
 
-            if (session && session.user) {
-                // User-Objekt holen. Entweder voller Name aus Google OAuth oder die E-Mail Adresse bei Mail-Login
-                const displayName = session.user.user_metadata.full_name || session.user.email;
-
-                // Ersetzt den Login Button durch den Usernamen + Logout Button
                 authArea.innerHTML = `
                     <div class="flex items-center space-x-3 bg-zinc-900/80 border border-zinc-800 px-3 py-1 rounded-lg">
                         <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -211,21 +207,54 @@
                         </button>
                     </div>
                 `;
+            } else {
+                authArea.innerHTML = `
+                    <button id="loginBtn" onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
+                        Login
+                    </button>
+                `;
             }
         }
 
-        // --- 3. LOGOUT ABSCHICKEN ---
+        // --- 3. DYNAMISCHER AUTH CHECKER ---
+        function initAuthCheck() {
+            // Check beim direkten Laden der Seite
+            _supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    updateUserHeader(session.user);
+                    cleanUrlHash();
+                }
+            });
+
+            // Lauscher für OAuth-Redirect-Events im Live-Betrieb
+            _supabase.auth.onAuthStateChange((event, session) => {
+                if (session) {
+                    updateUserHeader(session.user);
+                    cleanUrlHash();
+                } else {
+                    updateUserHeader(null);
+                }
+            });
+        }
+
+        // Hilfsfunktion: Säubert die lange URL im Browser
+        function cleanUrlHash() {
+            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token'))) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+        }
+
+        // --- 4. LOGOUT EXECUTION ---
         async function handleLogout() {
             const { error } = await _supabase.auth.signOut();
             if (error) {
                 alert("Fehler beim Abmelden: " + error.message);
             } else {
-                // Lädt die Seite neu, damit der Header wieder zurückgesetzt wird
                 window.location.reload();
             }
         }
 
-        // --- 4. SPRACH-LOGIK ---
+        // --- 5. SPRACH-LOGIK ---
         const translations = document.querySelectorAll('[data-lang-de]');
         let currentLang = 'de';
         
@@ -251,11 +280,11 @@
                 changeLanguage('de');
             }
 
-            // Check Login Status
-            checkUserSession();
+            // Starte den dynamischen Auth-Check
+            initAuthCheck();
         });
 
-        // --- 5. SCROLL-ANIMATION ---
+        // --- 6. SCROLL-ANIMATION ---
         const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
         const checkScroll = () => {
             const triggerBottom = window.innerHeight / 5 * 4.5;
@@ -271,7 +300,7 @@
         window.addEventListener('scroll', checkScroll);
         checkScroll();
 
-        // --- 6. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
+        // --- 7. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
         function redirectToAuth(mode, role = 'pilot') {
             window.location.href = `login.html?mode=${mode}&role=${role}`;
         }
