@@ -103,7 +103,6 @@
     <script>
         // --- 1. SUPABASE INITIALISIERUNG ---
         const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        // Fix des korrekten Keys (v statt V)
         const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -111,9 +110,16 @@
         let modalMode = 'login'; 
         let selectedRole = 'pilot';
 
+        // Hilfsfunktion zur Ermittlung der korrekten Redirect-URL
+        function getRedirectUrl() {
+            // Schneidet den aktuellen Dateinamen ab und händigt den Pfad zur index.html aus
+            const currentPath = window.location.pathname;
+            const directoryPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+            return window.location.origin + directoryPath + '/index.html';
+        }
+
         // --- 2. SESSION-CHECK & PARAMETER AUSLESEN ---
         window.addEventListener('DOMContentLoaded', async () => {
-            // Falls der User bereits eingeloggt ist, direkt zur Startseite schicken
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 window.location.href = 'index.html';
@@ -234,12 +240,23 @@
 
         // --- 4. GOOGLE OAUTH FLOW ---
         async function loginWithGoogle() {
-            const { data, error } = await _supabase.auth.signInWithOAuth({
+            const oauthOptions = {
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin + '/index.html'
+                    redirectTo: getRedirectUrl()
                 }
-            });
+            };
+
+            // Falls sich jemand neu über Google registriert, hängen wir die Metadaten an!
+            if (modalMode === 'register') {
+                const airlineName = document.getElementById('airlineInput').value;
+                oauthOptions.options.data = {
+                    role: selectedRole,
+                    airline_name: selectedRole === 'ceo' ? airlineName : null
+                };
+            }
+
+            const { data, error } = await _supabase.auth.signInWithOAuth(oauthOptions);
 
             if (error) {
                 alert("Google Login Fehler: " + error.message);
