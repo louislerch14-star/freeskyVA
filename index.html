@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreeSky VA - Professional Virtual Airline Platform</title>
     
-    <link class="scroll-zoom-reveal" rel="icon" type="image/png" href="logo.png">
-
+    <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         tailwind.config = {
             theme: {
@@ -25,14 +22,12 @@
         }
     </script>
     <style>
-        /* Verhindert automatische Bindestriche */
         * {
             hyphens: none !important;
             -webkit-hyphens: none !important;
             -ms-hyphens: none !important;
         }
 
-        /* Erste Sektion: Hintergrundbild fixieren */
         .bg-airplane {
             background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('airplane01.webp');
             background-size: cover;
@@ -40,37 +35,20 @@
             background-attachment: fixed;
         }
 
-        /* Neue, krasse 3D-Zoom-Animation aus dem Hintergrund heraus */
         .scroll-zoom-reveal {
             opacity: 0;
-            transform: scale(0.85) translateY(40px); /* Startet kleiner (im Hintergrund) und weiter unten */
-            filter: blur(4px); /* Leicht unscharf im Hintergrund */
+            transform: scale(0.85) translateY(40px);
+            filter: blur(4px);
             transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
                         transform 1s cubic-bezier(0.16, 1, 0.3, 1), 
                         filter 1s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform, opacity, filter;
         }
 
-        /* Zustand, wenn die Sektion reingeflogen ist */
         .scroll-zoom-reveal.active {
             opacity: 1;
-            transform: scale(1) translateY(0); /* Fliegt auf Normalgröße nach vorne */
-            filter: blur(0); /* Wird perfekt scharf */
-        }
-
-        /* Sanfter Übergang für das gesamte Modal-Overlay */
-        #loginModal {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        /* Eleganter Zoom-In Effekt für die eigentliche Formular-Box */
-        #modalBox {
-            transform: scale(0.95) translateY(15px);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #loginModal.open #modalBox {
             transform: scale(1) translateY(0);
+            filter: blur(0);
         }
     </style>
 </head>
@@ -92,7 +70,7 @@
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 text-[10px]">▼</div>
                 </div>
 
-                <button onclick="openModal('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
+                <button onclick="redirectToAuth('login')" class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-xs hover:bg-gray-200 transition">
                     Login
                 </button>
             </div>
@@ -109,10 +87,10 @@
             </p>
 
             <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full justify-center px-6">
-                <button onclick="openModal('register-ceo')" class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
+                <button onclick="redirectToAuth('register', 'ceo')" class="bg-vercelBlue text-white px-8 py-3 rounded-md font-medium text-sm hover:bg-blue-600 transition duration-200" data-lang-de="Airline gründen" data-lang-en="Create Airline">
                     Airline gründen
                 </button>
-                <button onclick="openModal('register-pilot')" class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
+                <button onclick="redirectToAuth('register', 'pilot')" class="bg-zinc-900/90 border border-zinc-800 text-zinc-300 px-8 py-3 rounded-md font-medium text-sm hover:bg-zinc-800 hover:text-white transition duration-200" data-lang-de="Als Pilot beitreten" data-lang-en="Join as Pilot">
                     Als Pilot beitreten
                 </button>
             </div>
@@ -197,49 +175,6 @@
         </div>
     </section>
 
-    <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none">
-        <div id="modalBox" class="bg-zincBase border border-zinc-800 w-full max-w-md p-8 rounded-xl shadow-2xl relative mx-4">
-            
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white text-lg transition">&times;</button>
-            
-            <div class="text-center mb-6">
-                <h3 id="modalTitle" class="text-2xl font-semibold tracking-tight">Anmelden</h3>
-                <p id="modalSubtitle" class="text-zinc-500 text-xs mt-1">Willkommen zurück bei FreeSky VA</p>
-            </div>
-
-            <div id="roleSelector" class="grid grid-cols-2 gap-2 bg-black p-1 rounded-lg mb-6 border border-zinc-800/60 hidden">
-                <button id="rolePilotBtn" onclick="setRole('pilot')" type="button" class="py-1.5 text-xs font-medium rounded-md bg-zinc-900 text-white border border-zinc-800">Pilot</button>
-                <button id="roleCeoBtn" onclick="setRole('ceo')" type="button" class="py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-white">CEO (Airline Inhaber)</button>
-            </div>
-
-            <form onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div id="airlineNameField" class="space-y-1.5 hidden">
-                    <label class="text-zinc-400 text-xs uppercase tracking-wider font-medium">Airline Name</label>
-                    <input type="text" id="airlineInput" placeholder="z.B. AeroBerlin Virtual" class="w-full bg-black border border-zinc-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-vercelBlue transition">
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="text-zinc-400 text-xs uppercase tracking-wider font-medium">E-Mail Adresse</label>
-                    <input type="email" id="emailInput" required placeholder="name@beispiel.de" class="w-full bg-black border border-zinc-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-vercelBlue transition">
-                </div>
-                
-                <div class="space-y-1.5">
-                    <label class="text-zinc-400 text-xs uppercase tracking-wider font-medium">Passwort</label>
-                    <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-black border border-zinc-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-vercelBlue transition">
-                </div>
-
-                <button type="submit" id="modalSubmitBtn" class="w-full bg-white text-black font-medium text-sm py-2.5 rounded-md hover:bg-zinc-200 transition mt-6">
-                    Anmelden
-                </button>
-            </form>
-
-            <div class="text-center mt-6 pt-4 border-t border-zinc-900 text-xs text-zinc-500">
-                <span id="modalFooterText">Noch kein Konto?</span> 
-                <button id="modalFooterLink" onclick="toggleModalMode()" class="text-vercelBlue hover:underline ml-1">Jetzt registrieren</button>
-            </div>
-        </div>
-    </div>
-
     <footer class="bg-black border-t border-zinc-900 py-12 text-zinc-600 text-xs">
         <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <span class="font-medium tracking-wider text-zinc-400">FREESKY VA</span>
@@ -248,13 +183,7 @@
     </footer>
 
     <script>
-        // --- 1. SUPABASE INITIALISIERUNG ---
-        const SUPABASE_URL = "https://edvwehmarqjdddulaszn.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_Is-1JlnB5RLLOjv3EWfw1A_akdeF51J";
-        
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // --- 2. SPRACH-LOGIK ---
+        // --- 1. SPRACH-LOGIK ---
         const translations = document.querySelectorAll('[data-lang-de]');
         let currentLang = 'de';
         
@@ -279,7 +208,7 @@
             }
         });
 
-        // --- 3. SCROLL-ANIMATION ---
+        // --- 2. SCROLL-ANIMATION ---
         const zoomSections = document.querySelectorAll('.scroll-zoom-reveal');
         const checkScroll = () => {
             const triggerBottom = window.innerHeight / 5 * 4.5;
@@ -295,137 +224,10 @@
         window.addEventListener('scroll', checkScroll);
         checkScroll();
 
-        // --- 4. MODAL LOGIK ---
-        const modal = document.getElementById('loginModal');
-        let modalMode = 'login'; 
-        let selectedRole = 'pilot';
-
-        function openModal(type) {
-            modal.classList.add('open');
-            modal.classList.remove('pointer-events-none', 'opacity-0');
-            if (type === 'login') {
-                setLoginMode();
-            } else if (type === 'register-ceo') {
-                setRegisterMode();
-                setRole('ceo');
-            } else if (type === 'register-pilot') {
-                setRegisterMode();
-                setRole('pilot');
-            }
-        }
-
-        function closeModal() {
-            modal.classList.remove('open');
-            modal.classList.add('pointer-events-none', 'opacity-0');
-        }
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        function setLoginMode() {
-            modalMode = 'login';
-            document.getElementById('modalTitle').textContent = currentLang === 'en' ? 'Sign In' : 'Anmelden';
-            document.getElementById('modalSubtitle').textContent = currentLang === 'en' ? 'Welcome back to FreeSky VA' : 'Willkommen zurück bei FreeSky VA';
-            document.getElementById('roleSelector').classList.add('hidden');
-            document.getElementById('airlineNameField').classList.add('hidden');
-            document.getElementById('modalSubmitBtn').textContent = currentLang === 'en' ? 'Sign In' : 'Anmelden';
-            document.getElementById('modalFooterText').textContent = currentLang === 'en' ? "Don't have an account?" : 'Noch kein Konto?';
-            document.getElementById('modalFooterLink').textContent = currentLang === 'en' ? 'Register now' : 'Jetzt registrieren';
-        }
-
-        function setRegisterMode() {
-            modalMode = 'register';
-            document.getElementById('modalTitle').textContent = currentLang === 'en' ? 'Create Account' : 'Registrieren';
-            document.getElementById('modalSubtitle').textContent = currentLang === 'en' ? 'Join the virtual aviation network' : 'Werde Teil des virtuellen Luftfahrt-Netzwerks';
-            document.getElementById('roleSelector').classList.remove('hidden');
-            document.getElementById('modalSubmitBtn').textContent = currentLang === 'en' ? 'Get Started' : 'Konto erstellen';
-            document.getElementById('modalFooterText').textContent = currentLang === 'en' ? 'Already have an account?' : 'Bereits registriert?';
-            document.getElementById('modalFooterLink').textContent = currentLang === 'en' ? 'Sign In' : 'Jetzt anmelden';
-            updateRegisterFields();
-        }
-
-        function toggleModalMode() {
-            if (modalMode === 'login') {
-                setRegisterMode();
-            } else {
-                setLoginMode();
-            }
-        }
-
-        function setRole(role) {
-            selectedRole = role;
-            const pilotBtn = document.getElementById('rolePilotBtn');
-            const ceoBtn = document.getElementById('roleCeoBtn');
-            if (role === 'pilot') {
-                pilotBtn.className = "py-1.5 text-xs font-medium rounded-md bg-zinc-900 text-white border border-zinc-800";
-                ceoBtn.className = "py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-white";
-            } else {
-                ceoBtn.className = "py-1.5 text-xs font-medium rounded-md bg-zinc-900 text-white border border-zinc-800";
-                pilotBtn.className = "py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-white";
-            }
-            updateRegisterFields();
-        }
-
-        function updateRegisterFields() {
-            const airlineField = document.getElementById('airlineNameField');
-            if (modalMode === 'register' && selectedRole === 'ceo') {
-                airlineField.classList.remove('hidden');
-            } else {
-                airlineField.classList.add('hidden');
-            }
-        }
-
-        // --- 5. SUPABASE AUTH ABSENDE-LOGIK ---
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            const airlineName = document.getElementById('airlineInput').value;
-            const submitBtn = document.getElementById('modalSubmitBtn');
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = currentLang === 'en' ? 'Processing...' : 'Bitte warten...';
-
-            if (modalMode === 'login') {
-                // Login über Supabase Auth
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) {
-                    alert("Error: " + error.message);
-                } else {
-                    alert(currentLang === 'en' ? 'Login successful!' : 'Login erfolgreich!');
-                    closeModal();
-                }
-            } else {
-                // Registrierung über Supabase Auth
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            role: selectedRole,
-                            airline_name: selectedRole === 'ceo' ? airlineName : null
-                        }
-                    }
-                });
-
-                if (error) {
-                    alert("Error: " + error.message);
-                } else {
-                    alert(currentLang === 'en' ? 'Registration successful! Please check your email for confirmation.' : 'Registrierung erfolgreich! Bitte überprüfe deine E-Mails zur Bestätigung.');
-                    closeModal();
-                }
-            }
-
-            submitBtn.disabled = false;
-            submitBtn.textContent = modalMode === 'login' ? (currentLang === 'en' ? 'Sign In' : 'Anmelden') : (currentLang === 'en' ? 'Get Started' : 'Konto erstellen');
+        // --- 3. LEITET ZUR LOGIN/REGISTRIERSEITE WEITER ---
+        function redirectToAuth(mode, role = 'pilot') {
+            window.location.href = `login.html?mode=${mode}&role=${role}`;
         }
     </script>
-
 </body>
 </html>
