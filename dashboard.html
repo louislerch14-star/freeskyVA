@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profilübersicht - FreeSky VA</title>
+    <title>Flugbetrieb & Dashboard - FreeSky VA</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,11 +33,10 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <div onclick="toggleSettingsModal(true)" class="flex items-center space-x-3 cursor-pointer group bg-zinc-900/40 border border-zinc-800/60 px-3 py-1.5 rounded-lg hover:border-zinc-700 transition">
-                    <img id="navAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FreeSky" alt="Avatar" class="w-5 h-5 rounded-full border border-zinc-750 bg-zinc-800 object-cover">
-                    <span id="userEmail" class="text-xs text-zinc-400 group-hover:text-zinc-200">Lade Profil...</span>
-                    <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </div>
+                <a href="profile.html" class="text-xs bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg transition flex items-center space-x-2">
+                    <img id="navAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FreeSky" alt="Avatar" class="w-4 h-4 rounded-full object-cover">
+                    <span id="userEmail">Mein Profil</span>
+                </a>
                 <button onclick="handleLogout()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
                     Abmelden
                 </button>
@@ -49,128 +48,76 @@
         
         <div id="loadingState" class="text-center py-20">
             <div class="inline-block w-6 h-6 border-2 border-vercelBlue border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-zinc-500 text-xs mt-2">Profilübersicht wird initialisiert...</p>
+            <p class="text-zinc-500 text-xs mt-2">Flugbetriebsleitung wird initialisiert...</p>
         </div>
 
-        <div id="profileOverviewContent" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div id="dashboardContent" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <div class="space-y-6">
-                <div class="bg-zincBase border border-zinc-800/80 rounded-xl p-6 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
-                    <div class="absolute top-4 right-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide flex items-center space-x-1">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span>Standby</span>
-                    </div>
-
-                    <div class="w-24 h-24 rounded-full border-2 border-zinc-800 bg-zinc-900 p-1 mb-4 group relative overflow-hidden flex items-center justify-center">
-                        <img id="profileAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FreeSky" alt="Pilot Avatar" class="w-full h-full rounded-full object-cover">
-                    </div>
-
-                    <h2 id="viewFullName" class="text-xl font-semibold tracking-tight">Flugschüler</h2>
-                    <p id="viewUsername" class="text-zinc-500 text-xs font-mono mt-0.5">@FS_Pilot</p>
+                
+                <div class="bg-zincBase border border-zinc-800/80 rounded-xl p-6 shadow-2xl relative overflow-hidden">
+                    <h2 class="text-xs font-bold tracking-wider text-zinc-400 uppercase mb-4">Deine Fluggesellschaft</h2>
                     
-                    <div id="roleBadgeView" class="mt-3 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase">
-                        Lade Rolle...
-                    </div>
-
-                    <div class="w-full text-left border-t border-zinc-900 mt-6 pt-4">
-                        <h4 class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mb-2">Über mich & Hobbys</h4>
-                        <p id="viewBio" class="text-zinc-500 text-xs leading-relaxed italic font-light">
-                            Keine Biografie hinterlegt. Klicke auf Profil bearbeiten, um etwas über dich oder deine Hobbys zu erzählen!
-                        </p>
-                    </div>
-
-                    <button onclick="toggleSettingsModal(true)" class="w-full mt-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition py-2 text-xs font-medium rounded-lg">
-                        Profil bearbeiten
-                    </button>
-                </div>
-            </div>
-
-            <div class="lg:grid-cols-1 lg:col-span-2 space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
-                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Heimatbasis</span>
-                        <h3 id="statsHomeBase" class="text-xl font-semibold mt-1">—</h3>
-                    </div>
-                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
-                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Rang</span>
-                        <h3 id="statsRank" class="text-xl font-semibold mt-1 text-zinc-300">Cadet</h3>
-                    </div>
-                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
-                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Flugzeit</span>
-                        <h3 id="statsFlightHours" class="text-xl font-semibold mt-1">0.0 Std</h3>
-                    </div>
-                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
-                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Lieblingsmuster</span>
-                        <h3 id="statsFavoriteAircraft" class="text-xl font-semibold mt-1 text-zinc-400">A320 / B737</h3>
-                    </div>
-                </div>
-
-                <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <h2 class="text-sm font-semibold tracking-tight mb-2 text-zinc-300">Zugehörige Airline</h2>
-                    <div id="airlineStatusBox" class="py-4 text-xs text-zinc-500">
+                    <div id="airlineStatusBox" class="text-xs text-zinc-500">
                         Prüfe Anstellungsverhältnis...
                     </div>
                 </div>
 
+                <div class="bg-gradient-to-b from-zincBase to-black border border-zinc-800 p-6 rounded-xl shadow-xl space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-vercelBlue/10 border border-vercelBlue/20 flex items-center justify-center text-vercelBlue">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-200">FreeSky ACARS v1.0</h3>
+                            <p class="text-[10px] text-zinc-500">Flight Tracker Client für Windows</p>
+                        </div>
+                    </div>
+                    <p class="text-zinc-400 text-xs leading-relaxed font-light">
+                        Lade dir unseren hauseigenen Tracker herunter, um deine Flugstunden, Routen und Landungswerte direkt im MSFS fälschungssicher aufzuzeichnen.
+                    </p>
+                    <a href="downloads/FreeSky_ACARS_Setup.exe" download class="w-full bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs py-2.5 rounded-lg transition flex items-center justify-center space-x-2 shadow-lg">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Client herunterladen (.exe)</span>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                
                 <div class="bg-zincBase border border-zinc-800/60 p-6 rounded-xl shadow-xl">
-                    <h2 class="text-sm font-semibold tracking-tight mb-4 text-zinc-300">Letzte Flugbucheinträge</h2>
-                    <div class="text-center py-12 text-xs text-zinc-600 border border-dashed border-zinc-800 rounded-lg">
-                        Noch keine aufgezeichneten Flüge in der Akte vorhanden.
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-sm font-semibold tracking-tight text-zinc-200">Aktive Flüge & Dispatch</h2>
+                            <p class="text-[11px] text-zinc-500">Derzeitige Flugbewegungen deines Netzwerks</p>
+                        </div>
+                        <span class="bg-vercelBlue/10 border border-vercelBlue/20 text-vercelBlue text-[10px] px-2 py-0.5 rounded-full font-mono animate-pulse">LIVE</span>
+                    </div>
+
+                    <div class="text-center py-12 text-xs text-zinc-500 border border-dashed border-zinc-800 rounded-lg bg-black/20 space-y-3">
+                        <p>Momentan befinden sich keine aktiven Flüge in der Luft.</p>
+                        <button class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-[11px] px-3 py-1.5 rounded-md transition">
+                            + Flugplan via SimBrief importieren
+                        </button>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Flüge Gesamt</span>
+                        <h3 id="dashTotalFlights" class="text-xl font-semibold mt-1">0</h3>
+                    </div>
+                    <div class="bg-zincBase border border-zinc-800/60 p-5 rounded-xl shadow-xl">
+                        <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">Registrierte Airlines</span>
+                        <h3 id="dashTotalAirlines" class="text-xl font-semibold mt-1 text-zinc-300">—</h3>
+                    </div>
+                </div>
+
             </div>
 
         </div>
     </main>
-
-    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-zincBase border border-zinc-800 w-full max-w-md rounded-xl shadow-2xl p-6 overflow-hidden transform transition-all">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-5">
-                <h3 class="text-base font-semibold tracking-tight">Profil gestalten</h3>
-                <button onclick="toggleSettingsModal(false)" class="text-zinc-500 hover:text-white transition text-sm">✕</button>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Profilbild hochladen</label>
-                    <input type="file" id="avatarFileInput" accept="image/*" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-zinc-400 outline-none file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 transition">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Rufname / Name</label>
-                        <input type="text" id="setFullName" placeholder="Max Mustermann" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
-                    </div>
-                    <div>
-                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Pilot ID / Username</label>
-                        <input type="text" id="setUsername" placeholder="MUX134" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Heimatbasis (ICAO)</label>
-                        <input type="text" id="setHomeBase" placeholder="e.g. EDDH" maxlength="4" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white uppercase outline-none transition">
-                    </div>
-                    <div>
-                        <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Lieblingsmuster</label>
-                        <input type="text" id="setFavoriteAircraft" placeholder="A320 / B737" class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none transition">
-                    </div>
-                </div>
-                <div>
-                    <label class="text-zinc-500 text-[10px] uppercase font-bold block mb-1">Über mich & Hobbys (Optional)</label>
-                    <textarea id="setBio" rows="3" placeholder="Erzähle der Community was über dich, deine Sim-Hardware oder Hobbys..." class="w-full bg-black border border-zinc-800 focus:border-vercelBlue rounded-md px-3 py-2 text-xs text-white outline-none resize-none transition"></textarea>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-800">
-                <button onclick="toggleSettingsModal(false)" class="bg-transparent text-zinc-400 hover:text-white text-xs px-4 py-2 transition">
-                    Abbrechen
-                </button>
-                <button id="saveBtn" onclick="saveProfileData()" class="bg-vercelBlue hover:bg-blue-600 text-white font-medium text-xs px-4 py-2 rounded-md transition flex items-center">
-                    Änderungen speichern
-                </button>
-            </div>
-        </div>
-    </div>
 
     <footer class="bg-black/40 backdrop-blur-md border-t border-zinc-900 py-6 text-zinc-600 text-xs text-center">
         <p>&copy; 2026 FreeSky VA. Professional Flight Simulation Systems.</p>
@@ -182,7 +129,6 @@
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
-        let userRole = 'pilot';
 
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session }, error } = await _supabase.auth.getSession();
@@ -195,166 +141,101 @@
             currentUser = session.user;
             document.getElementById('userEmail').textContent = currentUser.email;
 
-            const userMetadata = currentUser.user_metadata;
-            userRole = userMetadata?.role || 'pilot';
-
-            const rBadge = document.getElementById('roleBadgeView');
-            if (userRole === 'ceo') {
-                rBadge.textContent = 'CEO';
-                rBadge.className = 'mt-3 bg-zinc-900 border border-emerald-500/20 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-emerald-400 uppercase';
-            } else {
-                rBadge.textContent = 'PILOT';
-                rBadge.className = 'mt-3 bg-zinc-900 border border-vercelBlue/20 px-3 py-1 rounded-md text-[10px] font-bold tracking-wider text-vercelBlue uppercase';
-            }
-
+            // Interface freischalten
             document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('profileOverviewContent').classList.remove('hidden');
+            document.getElementById('dashboardContent').classList.remove('hidden');
 
-            await loadUserProfile();
+            await loadDashboardData();
         });
 
-        async function loadUserProfile() {
+        async function loadDashboardData() {
             if (!currentUser) return;
 
-            let { data: profile, error } = await _supabase
+            // 1. Profil laden für Avatar & Airline-Verknüpfung
+            let { data: profile } = await _supabase
                 .from('profiles')
-                .select('username, full_name, home_base, avatar_url, bio, airline_id, favorite_aircraft, flight_hours, rank')
+                .select('avatar_url, username, airline_id')
                 .eq('id', currentUser.id)
                 .single();
 
-            if (error && error.code === 'PGRST116') {
-                const { data: newProfile, error: insertError } = await _supabase
-                    .from('profiles')
-                    .insert([{ id: currentUser.id, username: '', full_name: '', home_base: '', avatar_url: '', bio: '', favorite_aircraft: 'A320 / B737', flight_hours: 0.0, rank: 'Cadet' }])
-                    .select()
-                    .single();
-                
-                if (!insertError) profile = newProfile;
-            }
-
             if (profile) {
-                document.getElementById('viewFullName').textContent = profile.full_name || 'Flugschüler / Unbekannt';
-                document.getElementById('viewUsername').textContent = profile.username ? `@${profile.username}` : '@pilot';
-                document.getElementById('statsHomeBase').textContent = profile.home_base ? profile.home_base.toUpperCase() : '—';
-                
-                // Statistiken bleiben sichtbar, werden aber nur geladen
-                document.getElementById('statsRank').textContent = profile.rank || (userRole === 'ceo' ? 'Gründer' : 'Cadet');
-                document.getElementById('statsFlightHours').textContent = `${profile.flight_hours || '0.0'} Std`;
-                document.getElementById('statsFavoriteAircraft').textContent = profile.favorite_aircraft || 'A320 / B737';
-
-                if (profile.bio) {
-                    document.getElementById('viewBio').textContent = profile.bio;
-                    document.getElementById('viewBio').classList.remove('italic', 'text-zinc-600');
-                    document.getElementById('viewBio').classList.add('text-zinc-400');
-                } else {
-                    document.getElementById('viewBio').textContent = 'Keine Biografie hinterlegt. Klicke auf Profil bearbeiten, um etwas über dich oder deine Hobbys zu erzählen!';
-                    document.getElementById('viewBio').classList.add('italic', 'text-zinc-600');
-                }
-
                 let finalAvatarSrc = profile.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=" + (profile.username || currentUser.id);
-                document.getElementById('profileAvatar').src = finalAvatarSrc;
                 document.getElementById('navAvatar').src = finalAvatarSrc;
+            }
 
-                const airlineBox = document.getElementById('airlineStatusBox');
-                if (userRole === 'ceo') {
-                    const airlineName = currentUser.user_metadata?.airline_name || 'Deine Airline';
-                    airlineBox.innerHTML = `<div class="flex justify-between items-center bg-zinc-900/40 border border-zinc-800 p-3 rounded-lg">
-                        <div>
-                            <p class="text-white font-medium text-xs">${airlineName}</p>
-                            <p class="text-[10px] text-emerald-400 font-mono mt-0.5">Besitzer & Geschäftsführer</p>
+            // 2. Netzwerk-Statistiken ermitteln (Wie viele Airlines gibt es insgesamt?)
+            const { count: airlineCount } = await _supabase
+                .from('airlines')
+                .select('*', { count: 'exact', head: true });
+            
+            document.getElementById('dashTotalAirlines').textContent = airlineCount || 0;
+
+            // 3. Dynamische Airline-Box rendern (CEO vs. Angestellter vs. Arbeitslos)
+            const userRole = currentUser.user_metadata?.role || 'pilot';
+            const airlineBox = document.getElementById('airlineStatusBox');
+
+            if (userRole === 'ceo') {
+                // Wenn er CEO ist, laden wir seine Airline-Details live aus der Datenbank
+                let { data: myAirline } = await _supabase
+                    .from('airlines')
+                    .select('name, icao_code, home_hub')
+                    .eq('owner_id', currentUser.id)
+                    .single();
+
+                const aName = myAirline?.name || currentUser.user_metadata?.airline_name || 'Deine Airline';
+                const aIcao = myAirline?.icao_code || 'CEO';
+                const aHub = myAirline?.home_hub || '—';
+
+                airlineBox.innerHTML = `
+                    <div class="bg-zinc-900/50 border border-emerald-500/20 p-4 rounded-lg space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-white font-bold text-sm tracking-tight">${aName}</h4>
+                                <p class="text-[10px] text-emerald-400 font-mono mt-0.5">Rolle: Gründer & CEO</p>
+                            </div>
+                            <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-mono font-bold">${aIcao}</span>
                         </div>
-                        <span class="text-zinc-600 text-[10px]">Hauptsitz</span>
-                    </div>`;
-                } else if (profile.airline_id) {
-                    airlineBox.innerHTML = `<p class="text-zinc-300">Angestellt bei Airline-ID: <span class="font-mono text-vercelBlue">${profile.airline_id}</span></p>`;
-                } else {
-                    airlineBox.innerHTML = `<div class="border border-dashed border-zinc-800 p-4 text-center rounded-lg text-zinc-600">
-                        Du bist aktuell noch bei keiner virtuellen Airline unter Vertrag.
-                    </div>`;
-                }
+                        <div class="border-t border-zinc-800/60 pt-2 flex justify-between text-zinc-400 text-[11px]">
+                            <span>Hauptsitz (Hub):</span>
+                            <span class="font-mono text-white font-medium">${aHub}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (profile && profile.airline_id) {
+                // Wenn er Angestellter ist, suchen wir den Namen der Airline raus
+                let { data: hiredAirline } = await _supabase
+                    .from('airlines')
+                    .select('name, icao_code')
+                    .eq('id', profile.airline_id)
+                    .single();
 
-                // Inputs im Modal füllen (ohne Rang und Flugzeit)
-                document.getElementById('setFullName').value = profile.full_name || '';
-                document.getElementById('setUsername').value = profile.username || '';
-                document.getElementById('setHomeBase').value = profile.home_base || '';
-                document.getElementById('setBio').value = profile.bio || '';
-                document.getElementById('setFavoriteAircraft').value = profile.favorite_aircraft || 'A320 / B737';
-            }
-        }
+                const compName = hiredAirline?.name || 'Virtuelle Airline';
+                const compIcao = hiredAirline?.icao_code || 'PLT';
 
-        async function saveProfileData() {
-            if (!currentUser) return;
-
-            const saveBtn = document.getElementById('saveBtn');
-            saveBtn.disabled = true;
-            saveBtn.textContent = "Speichert...";
-
-            const fileInput = document.getElementById('avatarFileInput');
-            let avatarUrlValue = null;
-
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-${Math.floor(Date.now() / 1000)}.${fileExt}`;
-                const filePath = `${fileName}`;
-
-                let { error: uploadError } = await _supabase.storage
-                    .from('avatars')
-                    .upload(filePath, file);
-
-                if (uploadError) {
-                    alert("Bild-Upload fehlgeschlagen: " + uploadError.message);
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = "Änderungen speichern";
-                    return;
-                }
-
-                const { data } = _supabase.storage.from('avatars').getPublicUrl(filePath);
-                avatarUrlValue = data.publicUrl;
-            }
-
-            const fullNameValue = document.getElementById('setFullName').value;
-            const usernameValue = document.getElementById('setUsername').value;
-            const homeBaseValue = document.getElementById('setHomeBase').value.toUpperCase();
-            const bioValue = document.getElementById('setBio').value;
-            const favoriteAircraftValue = document.getElementById('setFavoriteAircraft').value;
-
-            const updateData = {
-                full_name: fullNameValue,
-                username: usernameValue,
-                home_base: homeBaseValue,
-                bio: bioValue,
-                favorite_aircraft: favoriteAircraftValue,
-                updated_at: new Date()
-            };
-
-            if (avatarUrlValue) {
-                updateData.avatar_url = avatarUrlValue;
-            }
-
-            const { error } = await _supabase
-                .from('profiles')
-                .update(updateData)
-                .eq('id', currentUser.id);
-
-            saveBtn.disabled = false;
-            saveBtn.textContent = "Änderungen speichern";
-
-            if (error) {
-                alert("Fehler beim Speichern: " + error.message);
+                airlineBox.innerHTML = `
+                    <div class="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg flex justify-between items-center">
+                        <div>
+                            <h4 class="text-zinc-200 font-medium text-xs">${compName}</h4>
+                            <p class="text-[10px] text-vercelBlue font-mono mt-0.5">Vertrag: Aktiver Pilot</p>
+                        </div>
+                        <span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-[10px] font-mono">${compIcao}</span>
+                    </div>
+                `;
             } else {
-                toggleSettingsModal(false);
-                fileInput.value = "";
-                await loadUserProfile();
-            }
-        }
-
-        function toggleSettingsModal(show) {
-            const modal = document.getElementById('settingsModal');
-            if (show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
+                // Komplett ohne Anstellung
+                airlineBox.innerHTML = `
+                    <div class="border border-dashed border-zinc-800 p-4 text-center rounded-lg bg-black/10 space-y-3">
+                        <p class="text-zinc-500 leading-relaxed">Du bist aktuell noch bei keiner virtuellen Airline unter Vertrag.</p>
+                        <div class="flex flex-col space-y-2 pt-1">
+                            <a href="create-airline.html" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white font-medium py-2 rounded transition block text-center">
+                                + Eigene Airline gründen
+                            </a>
+                            <a href="#" class="text-zinc-400 hover:text-white transition text-[11px] block text-center">
+                                Bestehender Airline beitreten
+                            </a>
+                        </div>
+                    </div>
+                `;
             }
         }
 
